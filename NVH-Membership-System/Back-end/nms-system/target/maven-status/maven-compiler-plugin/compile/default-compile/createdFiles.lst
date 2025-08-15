@@ -1,0 +1,15 @@
+com\nms\backend\dto\AccountDTO.class
+com\nms\backend\config\ModelMapperConfig.class
+com\nms\backend\dto\PaymentDTO.class
+com\nms\backend\dto\CheckInDTO$CheckInDTOBuilder.class
+com\nms\backend\entity\Booking.class
+com\nms\backend\entity\Account.class
+com\nms\backend\entity\Payment.class
+com\nms\backend\dto\MembershipTypeDTO.class
+com\nms\backend\entity\CheckIn.class
+com\nms\backend\NmsApplication.class
+com\nms\backend\dto\BookingDTO.class
+com\nms\backend\dto\MemberProfileDTO.class
+com\nms\backend\entity\MembershipType.class
+com\nms\backend\dto\CheckInDTO.class
+com\nms\backend\entity\MemberProfile.class
