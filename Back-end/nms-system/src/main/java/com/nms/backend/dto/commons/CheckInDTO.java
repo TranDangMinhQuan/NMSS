@@ -1,4 +1,4 @@
-package com.nms.backend.dto;
+package com.nms.backend.dto.commons;
 
 import lombok.*;
 

@@ -4,9 +4,9 @@ import com.nms.backend.dto.auth.AccountResponse;
 import com.nms.backend.dto.auth.ForgotPasswordRequest;
 import com.nms.backend.dto.auth.LoginRequest;
 import com.nms.backend.dto.auth.RegisterRequest;
-import com.nms.backend.dto.commons.EmailDetailForForgotPassword;
-import com.nms.backend.dto.commons.EmailDetailForRegister;
-import com.nms.backend.entity.Account;
+import com.nms.backend.dto.auth.EmailDetailForForgotPassword;
+import com.nms.backend.dto.auth.EmailDetailForRegister;
+import com.nms.backend.entity.auth.Account;
 import com.nms.backend.enums.Role;
 import com.nms.backend.enums.Status;
 import com.nms.backend.exceptions.exceptions.AuthenticationException;
@@ -23,6 +23,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -136,5 +138,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         account.setPassword(passwordEncoder.encode(newPassword));
         authenticationRepository.save(account);
+    }
+
+    @Override
+    public Account getCurrentUser(Principal principal) throws AuthenticationException {
+        if (principal == null || principal.getName() == null) {
+            throw new AuthenticationException("User not authenticated");
+        }
+
+        Account account = authenticationRepository.findAccountByEmail(principal.getName());
+        if (account == null) {
+            throw new AuthenticationException("User not found");
+        }
+        return account;
     }
 }

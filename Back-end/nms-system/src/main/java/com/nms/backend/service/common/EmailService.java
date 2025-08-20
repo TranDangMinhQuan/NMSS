@@ -1,10 +1,8 @@
 package com.nms.backend.service.common;
 
 import com.nms.backend.dto.auth.AccountCreateDTO;
-import com.nms.backend.dto.commons.EmailDetailForForgotPassword;
-import com.nms.backend.dto.commons.EmailDetailForRegister;
-
-import java.time.LocalDate;
+import com.nms.backend.dto.auth.EmailDetailForForgotPassword;
+import com.nms.backend.dto.auth.EmailDetailForRegister;
 
 public interface EmailService {
     void sendRegisterSuccessEmail(EmailDetailForRegister emailDetail);

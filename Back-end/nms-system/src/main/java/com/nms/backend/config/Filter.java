@@ -1,7 +1,7 @@
 package com.nms.backend.config;
 
 
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import com.nms.backend.exceptions.exceptions.AuthenticationException;
 import com.nms.backend.repository.auth.AccountRepository;
 import com.nms.backend.service.auth.impl.TokenServiceImpl;

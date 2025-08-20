@@ -1,4 +1,4 @@
-package com.nms.backend.entity;
+package com.nms.backend.entity.center;
 import jakarta.persistence.*;
 import lombok.*;
 

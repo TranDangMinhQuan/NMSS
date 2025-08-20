@@ -1,6 +1,6 @@
 package com.nms.backend.service.auth;
 
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import io.jsonwebtoken.Claims;
 
 import java.util.Date;

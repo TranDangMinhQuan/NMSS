@@ -2,8 +2,8 @@ package com.nms.backend.service.common.impl;
 
 
 import com.nms.backend.dto.auth.AccountCreateDTO;
-import com.nms.backend.dto.commons.EmailDetailForForgotPassword;
-import com.nms.backend.dto.commons.EmailDetailForRegister;
+import com.nms.backend.dto.auth.EmailDetailForForgotPassword;
+import com.nms.backend.dto.auth.EmailDetailForRegister;
 import com.nms.backend.service.common.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
