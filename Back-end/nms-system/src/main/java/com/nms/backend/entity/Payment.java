@@ -14,9 +14,6 @@ public class Payment {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private MemberProfile member;
-
     private Integer amount;
     private String method; // CARD, CASH
     private LocalDateTime paidAt;

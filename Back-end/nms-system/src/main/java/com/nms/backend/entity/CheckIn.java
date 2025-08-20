@@ -12,10 +12,6 @@ import java.time.LocalDateTime;
 public class CheckIn {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    private MemberProfile member;
-
     private String serviceType; // GYM, BOWLING
     private LocalDateTime checkInAt;
     private LocalDateTime checkOutAt;

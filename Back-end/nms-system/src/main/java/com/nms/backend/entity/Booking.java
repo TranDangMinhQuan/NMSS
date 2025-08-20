@@ -14,9 +14,6 @@ public class Booking {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private MemberProfile member;
-
     private String serviceType; // GYM or BOWLING
 
     private LocalDate date;
