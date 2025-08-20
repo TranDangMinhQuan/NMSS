@@ -1,6 +1,6 @@
-package com.nms.backend.dto.commons;
+package com.nms.backend.dto.auth;
 
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;

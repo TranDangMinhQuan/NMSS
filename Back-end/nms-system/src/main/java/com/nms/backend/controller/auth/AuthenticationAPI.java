@@ -1,7 +1,7 @@
 package com.nms.backend.controller.auth;
 
 import com.nms.backend.dto.auth.*;
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import com.nms.backend.service.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.nms.backend.entity;
+package com.nms.backend.entity.auth;
 import com.nms.backend.enums.Gender;
 import com.nms.backend.enums.Role;
 import com.nms.backend.enums.Status;
@@ -6,15 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.*;
-import lombok.*;
+
 import org.hibernate.annotations.Nationalized;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 

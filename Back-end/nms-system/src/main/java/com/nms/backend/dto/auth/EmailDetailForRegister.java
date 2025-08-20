@@ -1,4 +1,4 @@
-package com.nms.backend.dto.commons;
+package com.nms.backend.dto.auth;
 
 
 import lombok.AccessLevel;

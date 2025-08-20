@@ -4,7 +4,7 @@ import com.nms.backend.dto.auth.AccountCreateDTO;
 import com.nms.backend.dto.auth.AccountProfileDTO;
 import com.nms.backend.dto.auth.AccountResponse;
 import com.nms.backend.dto.auth.AccountUpdateDTO;
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import com.nms.backend.enums.Role;
 import com.nms.backend.enums.Status;
 import com.nms.backend.service.auth.AccountService;

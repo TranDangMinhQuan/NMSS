@@ -1,6 +1,6 @@
 package com.nms.backend.service.auth.impl;
 
-import com.nms.backend.entity.Account;
+import com.nms.backend.entity.auth.Account;
 import com.nms.backend.enums.Role;
 import com.nms.backend.service.auth.TokenService;
 import io.jsonwebtoken.*;
