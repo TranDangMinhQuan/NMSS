@@ -27,13 +27,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
 
     @Override
     public ServicePackageDTO create(ServicePackageDTO dto) {
-        ServicePackage pkg = new ServicePackage();
-        pkg.setName(dto.getName());
-        pkg.setMinPrice(dto.getMinPrice());
-        pkg.setMaxPrice(dto.getMaxPrice());
-        pkg.setTotalSessions(dto.getTotalSessions());
-        pkg.setDayConstraints(dto.getDayConstraints());
-        pkg.setMaxDurationMinutes(dto.getMaxDurationMinutes());
+        ServicePackage pkg = modelMapper.map(dto, ServicePackage.class);
 
         if (dto.getServiceIds() != null && !dto.getServiceIds().isEmpty()) {
             List<ServiceType> services = serviceTypeRepository.findAllById(dto.getServiceIds());
@@ -49,12 +43,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         ServicePackage pkg = packageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ServicePackage not found"));
 
-        pkg.setName(dto.getName());
-        pkg.setMinPrice(dto.getMinPrice());
-        pkg.setMaxPrice(dto.getMaxPrice());
-        pkg.setTotalSessions(dto.getTotalSessions());
-        pkg.setDayConstraints(dto.getDayConstraints());
-        pkg.setMaxDurationMinutes(dto.getMaxDurationMinutes());
+        modelMapper.map(dto, pkg);
 
         if (dto.getServiceIds() != null && !dto.getServiceIds().isEmpty()) {
             List<ServiceType> services = serviceTypeRepository.findAllById(dto.getServiceIds());
@@ -75,15 +64,31 @@ public class ServicePackageServiceImpl implements ServicePackageService {
 
     @Override
     public ServicePackageDTO getById(Long id) {
-        ServicePackage pkg = packageRepository.findById(id)
+        ServicePackage pkg = packageRepository.findByIdAndStatusTrue(id)
                 .orElseThrow(() -> new IllegalArgumentException("ServicePackage not found"));
         return modelMapper.map(pkg, ServicePackageDTO.class);
     }
 
     @Override
-    public List<ServicePackageDTO> getAll() {
-        List<ServicePackage> list = packageRepository.findAllByStatusTrue();
-        return list.stream()
+    public List<ServicePackageDTO> getByCenter(Long centerId) {
+        return packageRepository.findAllByServices_Center_IdAndStatusTrue(centerId)
+                .stream()
+                .map(pkg -> modelMapper.map(pkg, ServicePackageDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ServicePackageDTO> getByServiceType(Long serviceTypeId) {
+        return packageRepository.findAllByServices_IdAndStatusTrue(serviceTypeId)
+                .stream()
+                .map(pkg -> modelMapper.map(pkg, ServicePackageDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ServicePackageDTO> getByPriceRange(Double min, Double max) {
+        return packageRepository.findAllByMinPriceGreaterThanEqualAndMaxPriceLessThanEqualAndStatusTrue(min, max)
+                .stream()
                 .map(pkg -> modelMapper.map(pkg, ServicePackageDTO.class))
                 .collect(Collectors.toList());
     }
