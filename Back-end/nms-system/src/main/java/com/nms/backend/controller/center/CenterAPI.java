@@ -18,7 +18,7 @@ public class CenterAPI {
     private CenterService centerService;
 
     @PostMapping
-    @PreAuthorize("haRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public CenterDTO create(@RequestBody CenterDTO dto) {
         return centerService.create(dto);
     }
