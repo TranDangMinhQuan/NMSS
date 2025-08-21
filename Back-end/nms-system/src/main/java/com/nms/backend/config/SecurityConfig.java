@@ -1,6 +1,7 @@
 package com.nms.backend.config;
 
 
+import com.nms.backend.service.auth.impl.AuthenticationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,13 +40,14 @@ public class SecurityConfig {
 
     // Không cần AuthenticationServiceImpl ở đây nữa
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationServiceImpl authenticationServiceImpl) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .userDetailsService(authenticationServiceImpl)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
