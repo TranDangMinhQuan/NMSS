@@ -81,7 +81,7 @@ export interface Service {
   name: string;
   description: string;
   price_per_unit: number;
-  // 'month' added because some demo/mock services represent monthly packages
+  // ...existing code...
   unit_type: 'hour' | 'session' | 'game' | 'month';
   status: 'active' | 'inactive';
   category?: ServiceCategory;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Account } from '../types';
-import { demoUsers, demoPassword } from '../data/demoUsers';
+import { login as apiLogin } from '../services/api';
 
 const useAuth = () => {
     const [user, setUser] = useState<Account | null>(null);
@@ -20,31 +20,24 @@ const useAuth = () => {
         setLoading(false);
     }, []);
 
-    const login = async (credentials: { username: string; password: string }) => {
+    const login = async (credentials: { email: string; password: string }) => {
         setLoading(true);
         setError(null);
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const { username, password } = credentials;
-        
-        // Check if user exists and password is correct
-        if (demoUsers[username] && password === demoPassword) {
-            const userData = demoUsers[username];
+        try {
+            const userData = await apiLogin(credentials.email, credentials.password);
             setUser(userData);
-            // Save user to localStorage
             localStorage.setItem('nvh_user', JSON.stringify(userData));
             setLoading(false);
             return userData;
-        } else {
-            setError('Tên đăng nhập hoặc mật khẩu không đúng');
+        } catch (err) {
+            const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+            setError(errorMsg || 'Tên đăng nhập hoặc mật khẩu không đúng');
             setLoading(false);
             return undefined;
         }
     };
 
-    // Note: oauthLogin (demo Google sign-in) removed — app uses username/password demo flow only
+    // ...existing code...
 
     const logout = () => {
         setUser(null);

@@ -8,7 +8,7 @@ const AdminServiceManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
 
-  // Mock data for demo
+  // ...existing code...
   useEffect(() => {
     setTimeout(() => {
       setServices([

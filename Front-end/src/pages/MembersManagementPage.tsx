@@ -10,39 +10,7 @@ const MembersManagementPage: React.FC = () => {
   // Mock data
   useEffect(() => {
     setTimeout(() => {
-      const mockMembers: Account[] = [
-        {
-          account_id: '1',
-          username: 'nguyenvana',
-          email: 'nguyenvana@email.com',
-          phone: '0123456789',
-          role: 'member',
-          status: 'active',
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z',
-        },
-        {
-          account_id: '2',
-          username: 'tranthib',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'member',
-          status: 'active',
-          created_at: '2024-01-10T14:20:00Z',
-          updated_at: '2024-01-10T14:20:00Z',
-        },
-        {
-          account_id: '3',
-          username: 'levanc',
-          email: 'levanc@email.com',
-          phone: '0369852147',
-          role: 'member',
-          status: 'inactive',
-          created_at: '2024-01-05T09:15:00Z',
-          updated_at: '2024-01-05T09:15:00Z',
-        },
-      ];
-      setMembers(mockMembers);
+  setMembers([]);
       setLoading(false);
     }, 1000);
   }, []);

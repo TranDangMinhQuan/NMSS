@@ -8,7 +8,7 @@ const AdminPackageManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
 
-  // Mock data for demo - using existing Package interface
+  // ...existing code...
   useEffect(() => {
     setTimeout(() => {
       setPackages([
@@ -147,7 +147,7 @@ const AdminPackageManagement: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Quản lý Gói Dịch vụ</h1>
           <p className="text-gray-600 mt-2">Quản lý các gói dịch vụ và combo cho khách hàng</p>
-          {/* Show count of mock services to ensure the services variable is used in this component */}
+          {/* ...existing code... */}
           <p className="text-sm text-gray-500 mt-1">Danh sách dịch vụ hiện có: {services.length}</p>
         </div>
         <button
