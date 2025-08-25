@@ -16,9 +16,9 @@ const MembersManagementPage: React.FC = () => {
   }, []);
 
   const filteredMembers = members.filter(member => {
-    const matchesSearch = member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.phone.includes(searchTerm);
+    const matchesSearch = member.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         member.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         member.phone?.includes(searchTerm);
     const matchesStatus = filterStatus === 'all' || member.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -153,7 +153,7 @@ const MembersManagementPage: React.FC = () => {
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                         <span className="text-primary-600 font-medium text-sm">
-                          {member.username.charAt(0).toUpperCase()}
+                          {(member.username ? member.username.charAt(0).toUpperCase() : '')}
                         </span>
                       </div>
                       <div className="ml-4">

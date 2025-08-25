@@ -1,11 +1,22 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// Toast component đơn giản
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 2500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+      {message}
+    </div>
+  );
+}
+import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const BookingPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialService = searchParams.get('service') || '';
   const [selectedService, setSelectedService] = useState(initialService);
@@ -19,6 +30,7 @@ const BookingPage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedDuration, setSelectedDuration] = useState('1');
   const [loading, setLoading] = useState(false);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const { user } = useAuth();
 
   const services = [
@@ -69,8 +81,7 @@ const BookingPage: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
       if (!isMember) {
-        // Non-members cannot proceed to payment; prompt login
-        alert('Vui lòng đăng nhập bằng tài khoản thành viên để thanh toán.');
+        setToastMsg('Vui lòng đăng nhập bằng tài khoản thành viên để thanh toán.');
         return;
       }
       if (!selectedServiceData) return;
@@ -92,6 +103,7 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Đặt chỗ dịch vụ</h1>
