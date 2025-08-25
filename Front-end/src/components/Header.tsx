@@ -104,11 +104,11 @@ const Header: React.FC = () => {
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
                   <div className="text-sm text-gray-700">
-                    Xin chào, <span className="font-medium">{user.username}</span>
+                    Xin chào, <span className="font-medium">{user.username ?? user.fullName ?? 'User'}</span>
                   </div>
                   <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-primary-600 font-medium text-sm">
-                      {user.username.charAt(0).toUpperCase()}
+                      {(user.username?.charAt(0) ?? user.fullName?.charAt(0) ?? 'U').toUpperCase()}
                     </span>
                   </div>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

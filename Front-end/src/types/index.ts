@@ -1,7 +1,8 @@
 // Account Types
 export interface Account {
   account_id: string;
-  username: string;
+  username?: string;
+  fullName?: string;
   email: string;
   phone: string;
   role: 'guest' | 'member' | 'staff' | 'admin';

@@ -24,7 +24,11 @@ const useAuth = () => {
         setLoading(true);
         setError(null);
         try {
-            const userData = await apiLogin(credentials.email, credentials.password);
+            let userData = await apiLogin(credentials.email, credentials.password);
+            // Chuyển role về chữ thường nếu có
+            if (userData?.role) {
+                userData = { ...userData, role: userData.role.toLowerCase() };
+            }
             setUser(userData);
             localStorage.setItem('nvh_user', JSON.stringify(userData));
             setLoading(false);

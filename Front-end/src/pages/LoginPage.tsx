@@ -24,10 +24,18 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       const user = await login({ email: formData.email, password: formData.password });
-      if (user && user.role === 'member') {
-        navigate('/member-services');
-      } else if (user) {
-        navigate('/dashboard');
+      if (user) {
+        if (user.role === 'admin') {
+          navigate('/dashboard');
+        } else if (user.role === 'member') {
+          navigate('/member-services');
+        } else if (user.role === 'staff') {
+          navigate('/members');
+        } else {
+          // Nếu role không hợp lệ, logout và về trang login
+          localStorage.removeItem('nvh_user');
+          navigate('/login');
+        }
       }
     } catch (err) {
       console.error('Login failed:', err);

@@ -1,3 +1,23 @@
+export interface MemberProfile {
+    fullName: string;
+    email: string;
+    gender: 'MALE' | 'FEMALE';
+    dateOfBirth: string;
+    cccd: string;
+    phone: string;
+    address: string;
+    status: string;
+}
+
+export async function getMemberProfile() {
+    const response = await api.get<MemberProfile>('/api/account/member/profile');
+    return response.data;
+}
+
+export async function updateMemberProfile(data: Partial<MemberProfile>) {
+    const response = await api.put<MemberProfile>('/api/account/member/profile', data);
+    return response.data;
+}
 import axios from 'axios';
 
 const api = axios.create({

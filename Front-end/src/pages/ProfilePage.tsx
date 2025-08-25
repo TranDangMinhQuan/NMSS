@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { getMemberProfile, updateMemberProfile } from '../services/api';
+import type { MemberProfile } from '../services/api';
 
 type ProfileUser = {
   username: string;
@@ -12,23 +14,47 @@ type ProfileUser = {
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
-  const u = user as ProfileUser | null;
-  const [form, setForm] = useState({
-    username: u?.username || '',
-    email: u?.email || '',
-    fullName: u?.fullName || '',
-    phone: u?.phone || '',
-  });
+  const [profile, setProfile] = useState<MemberProfile | null>(null);
+  const [form, setForm] = useState<MemberProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        setLoading(true);
+        const data = await getMemberProfile();
+        setProfile(data);
+        setForm(data);
+      } catch (err) {
+        setError('Không thể tải thông tin hồ sơ');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!form) return;
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    // For demo app we only update local state; persistent backend not implemented
-    // You may want to extend the auth hook to save profile updates
-    alert('Lưu thông tin thành công (demo)');
-    setEditing(false);
+  const handleSave = async () => {
+    if (!form) return;
+    try {
+      setLoading(true);
+      const updated = await updateMemberProfile(form);
+      setProfile(updated);
+      setForm(updated);
+      setEditing(false);
+      setError(null);
+      alert('Cập nhật thành công!');
+    } catch (err) {
+      setError('Cập nhật thất bại');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!user) {
@@ -41,17 +67,34 @@ const ProfilePage: React.FC = () => {
       </div>
     );
   }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-600">Đang tải thông tin...</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-600">{error}</div>
+      </div>
+    );
+  }
+  if (!profile || !form) {
+    return null;
+  }
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-2xl">
-            {user.username.charAt(0).toUpperCase()}
+            {(form.fullName?.charAt(0) ?? 'U').toUpperCase()}
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{user.username}</h1>
-            <div className="text-sm text-gray-500">Role: {user.role}</div>
+            <h1 className="text-2xl font-bold">{form.fullName}</h1>
+            <div className="text-sm text-gray-500">Trạng thái: {form.status}</div>
           </div>
           <div className="ml-auto">
             <button onClick={() => setEditing(!editing)} className="btn-primary">{editing ? 'Hủy' : 'Chỉnh sửa'}</button>
@@ -63,16 +106,28 @@ const ProfilePage: React.FC = () => {
             <h3 className="text-sm font-medium text-gray-700 mb-2">Thông tin cá nhân</h3>
             <div className="space-y-3">
               <div>
-                <div className="text-xs text-gray-500">Tên đăng nhập</div>
-                <div className="text-sm">{user.username}</div>
-              </div>
-              <div>
                 <div className="text-xs text-gray-500">Email</div>
-                <div className="text-sm">{u?.email || '—'}</div>
+                <div className="text-sm">{form.email}</div>
               </div>
               <div>
                 <div className="text-xs text-gray-500">Số điện thoại</div>
-                <div className="text-sm">{u?.phone || '—'}</div>
+                <div className="text-sm">{form.phone}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">CCCD</div>
+                <div className="text-sm">{form.cccd}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Giới tính</div>
+                <div className="text-sm">{form.gender}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Ngày sinh</div>
+                <div className="text-sm">{form.dateOfBirth?.slice(0, 10)}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Địa chỉ</div>
+                <div className="text-sm">{form.address}</div>
               </div>
             </div>
           </div>
@@ -93,8 +148,16 @@ const ProfilePage: React.FC = () => {
                   <label htmlFor="phone" className="block text-sm text-gray-700">Số điện thoại</label>
                   <input id="phone" name="phone" value={form.phone} onChange={handleChange} className="input-field mt-1" />
                 </div>
+                <div>
+                  <label htmlFor="cccd" className="block text-sm text-gray-700">CCCD</label>
+                  <input id="cccd" name="cccd" value={form.cccd} onChange={handleChange} className="input-field mt-1" />
+                </div>
+                <div>
+                  <label htmlFor="address" className="block text-sm text-gray-700">Địa chỉ</label>
+                  <input id="address" name="address" value={form.address} onChange={handleChange} className="input-field mt-1" />
+                </div>
                 <div className="pt-2">
-                  <button onClick={handleSave} className="btn-primary">Lưu</button>
+                  <button type="button" onClick={handleSave} className="btn-primary">Lưu</button>
                 </div>
               </div>
             ) : (
