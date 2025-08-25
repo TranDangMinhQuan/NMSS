@@ -3,14 +3,6 @@ import { useAuth } from '../hooks/useAuth';
 import { getMemberProfile, updateMemberProfile } from '../services/api';
 import type { MemberProfile } from '../services/api';
 
-type ProfileUser = {
-  username: string;
-  role: string;
-  email?: string;
-  fullName?: string;
-  phone?: string;
-};
-
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
@@ -26,7 +18,7 @@ const ProfilePage: React.FC = () => {
         const data = await getMemberProfile();
         setProfile(data);
         setForm(data);
-      } catch (err) {
+      } catch {
         setError('Không thể tải thông tin hồ sơ');
       } finally {
         setLoading(false);
@@ -50,7 +42,7 @@ const ProfilePage: React.FC = () => {
       setEditing(false);
       setError(null);
       alert('Cập nhật thành công!');
-    } catch (err) {
+    } catch {
       setError('Cập nhật thất bại');
     } finally {
       setLoading(false);
