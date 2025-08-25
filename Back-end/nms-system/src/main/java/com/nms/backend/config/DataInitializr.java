@@ -1,7 +1,7 @@
 package com.nms.backend.config;
 
 import com.nms.backend.entity.auth.Account;
-import com.nms.backend.entity.center.Center;
+// import com.nms.backend.entity.center.Center;
 import com.nms.backend.enums.Role;
 import com.nms.backend.enums.Status;
 import com.nms.backend.repository.auth.AuthenticationRepository;
