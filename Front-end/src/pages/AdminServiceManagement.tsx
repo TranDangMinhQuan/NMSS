@@ -1,66 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import type { Service, ServiceCategory } from '../types';
+import { getServiceTypesByCenter, createServiceType, updateServiceType, deleteServiceType as apiDeleteServiceType, type ServiceTypeDTO } from '../services/api';
 
 const AdminServiceManagement: React.FC = () => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [serviceTypes, setServiceTypes] = useState<ServiceTypeDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingService, setEditingService] = useState<ServiceTypeDTO | null>(null);
 
   // ...existing code...
   useEffect(() => {
-    setTimeout(() => {
-      setServices([
-        {
-          service_id: '1',
-          category_id: '1',
-          name: 'Phòng Gym',
-          description: 'Phòng tập thể dục hiện đại với đầy đủ thiết bị',
-          price_per_unit: 200000,
-          unit_type: 'month',
-          status: 'active',
-          category: {
-            category_id: '1',
-            center_id: '1',
-            name: 'Thể thao',
-            description: 'Các dịch vụ thể thao và fitness'
-          }
-        },
-        {
-          service_id: '2',
-          category_id: '2',
-          name: 'Bowling',
-          description: 'Sân bowling chuyên nghiệp với 8 làn chơi',
-          price_per_unit: 80000,
-          unit_type: 'game',
-          status: 'active',
-          category: {
-            category_id: '2',
-            center_id: '1',
-            name: 'Giải trí',
-            description: 'Các dịch vụ giải trí và vui chơi'
-          }
-        }
-      ]);
-
-      setCategories([
-        {
-          category_id: '1',
-          center_id: '1',
-          name: 'Thể thao',
-          description: 'Các dịch vụ thể thao và fitness'
-        },
-        {
-          category_id: '2',
-          center_id: '1',
-          name: 'Giải trí',
-          description: 'Các dịch vụ giải trí và vui chơi'
-        }
-      ]);
-
-      setLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try {
+        // TODO: replace 1 with selected/active center id when available
+        const data = await getServiceTypesByCenter(1);
+        setServiceTypes(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const handleAddService = () => {
@@ -68,38 +26,29 @@ const AdminServiceManagement: React.FC = () => {
     setEditingService(null);
   };
 
-  const handleEditService = (service: Service) => {
+  const handleEditService = (service: ServiceTypeDTO) => {
     setEditingService(service);
     setShowAddModal(true);
   };
 
-  const handleDeleteService = (serviceId: string) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
-      setServices(services.filter(s => s.service_id !== serviceId));
-    }
+  const handleDeleteService = async (serviceId: number) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) return;
+    await apiDeleteServiceType(serviceId);
+    setServiceTypes(serviceTypes.filter(s => s.id !== serviceId));
   };
 
-  const handleSaveService = (serviceData: Partial<Service>) => {
+  const handleSaveService = async (serviceData: Partial<ServiceTypeDTO>) => {
     if (editingService) {
-      // Update existing service
-      setServices(services.map(s => 
-        s.service_id === editingService.service_id 
-          ? { ...s, ...serviceData }
-          : s
-      ));
+      const updated = await updateServiceType(editingService.id, serviceData);
+      setServiceTypes(serviceTypes.map(s => s.id === editingService.id ? updated : s));
     } else {
-      // Add new service
-      const newService: Service = {
-        service_id: Date.now().toString(),
-        category_id: serviceData.category_id || '1',
+      const created = await createServiceType({
         name: serviceData.name || '',
         description: serviceData.description || '',
-        price_per_unit: serviceData.price_per_unit || 0,
-        unit_type: serviceData.unit_type || 'hour',
-        status: 'active',
-        category: categories.find(c => c.category_id === serviceData.category_id)
-      };
-      setServices([...services, newService]);
+        centerId: 1,
+        status: serviceData.status ?? true
+      });
+      setServiceTypes([...serviceTypes, created]);
     }
     setShowAddModal(false);
     setEditingService(null);
@@ -132,23 +81,17 @@ const AdminServiceManagement: React.FC = () => {
         </button>
       </div>
 
-      {/* Services Table */}
+      {/* Service Types Table (BE: ServiceTypeDTO) */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tên dịch vụ
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Danh mục
+                  Tên loại dịch vụ
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Mô tả
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Giá
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Trạng thái
@@ -159,29 +102,21 @@ const AdminServiceManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {services.map((service) => (
-                <tr key={service.service_id} className="hover:bg-gray-50">
+              {serviceTypes.map((service) => (
+                <tr key={service.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{service.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{service.category?.name}</div>
-                  </td>
-                  <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 max-w-xs truncate">{service.description}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {service.price_per_unit.toLocaleString()} VNĐ/{service.unit_type}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      service.status === 'active' 
+                      service.status 
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-red-100 text-red-800'
                     }`}>
-                      {service.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+                      {service.status ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -193,7 +128,7 @@ const AdminServiceManagement: React.FC = () => {
                         Sửa
                       </button>
                       <button
-                        onClick={() => handleDeleteService(service.service_id)}
+                        onClick={() => handleDeleteService(service.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         Xóa
@@ -211,7 +146,6 @@ const AdminServiceManagement: React.FC = () => {
       {showAddModal && (
         <ServiceModal
           service={editingService}
-          categories={categories}
           onSave={handleSaveService}
           onClose={() => {
             setShowAddModal(false);
@@ -223,22 +157,18 @@ const AdminServiceManagement: React.FC = () => {
   );
 };
 
-// Service Modal Component
+// Service Modal Component (align with ServiceTypeDTO)
 interface ServiceModalProps {
-  service: Service | null;
-  categories: ServiceCategory[];
-  onSave: (data: Partial<Service>) => void;
+  service: ServiceTypeDTO | null;
+  onSave: (data: Partial<ServiceTypeDTO>) => void;
   onClose: () => void;
 }
 
-const ServiceModal: React.FC<ServiceModalProps> = ({ service, categories, onSave, onClose }) => {
+const ServiceModal: React.FC<ServiceModalProps> = ({ service, onSave, onClose }) => {
   const [formData, setFormData] = useState({
     name: service?.name || '',
     description: service?.description || '',
-    category_id: service?.category_id || '',
-    price_per_unit: service?.price_per_unit || 0,
-    unit_type: service?.unit_type || 'hour',
-    status: service?.status || 'active'
+    status: service?.status ?? true
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -267,23 +197,6 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, categories, onSave
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Danh mục</label>
-              <select
-                value={formData.category_id}
-                onChange={(e) => setFormData({...formData, category_id: e.target.value})}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                required
-              >
-                <option value="">Chọn danh mục</option>
-                {categories.map(category => (
-                  <option key={category.category_id} value={category.category_id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-700">Mô tả</label>
               <textarea
                 value={formData.description}
@@ -293,32 +206,19 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, categories, onSave
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {service && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Giá</label>
-                <input
-                  type="number"
-                  value={formData.price_per_unit}
-                  onChange={(e) => setFormData({...formData, price_per_unit: Number(e.target.value)})}
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Đơn vị</label>
+                <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
                 <select
-                  value={formData.unit_type}
-                  onChange={(e) => setFormData({...formData, unit_type: e.target.value as 'hour' | 'session' | 'game'})}
+                  value={String(formData.status)}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value === 'true' })}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value="hour">Giờ</option>
-                  <option value="session">Buổi</option>
-                  <option value="game">Ván</option>
-                  <option value="month">Tháng</option>
+                  <option value="true">Hoạt động</option>
+                  <option value="false">Ngừng hoạt động</option>
                 </select>
               </div>
-            </div>
+            )}
 
             <div className="flex justify-end space-x-3 pt-4">
               <button

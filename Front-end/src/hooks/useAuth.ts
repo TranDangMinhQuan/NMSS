@@ -20,11 +20,18 @@ const useAuth = () => {
         setLoading(false);
     }, []);
 
+    const normalizeRole = (role: string) => {
+        if (!role) return '';
+        if (role.startsWith('ROLE_')) return role.replace('ROLE_', '').toLowerCase();
+        return role.toLowerCase();
+    };
+
     const login = async (credentials: { email: string; password: string }) => {
         setLoading(true);
         setError(null);
         try {
             const userData = await apiLogin(credentials.email, credentials.password);
+            userData.role = normalizeRole(userData.role);
             setUser(userData);
             localStorage.setItem('nvh_user', JSON.stringify(userData));
             setLoading(false);
@@ -36,8 +43,6 @@ const useAuth = () => {
             return undefined;
         }
     };
-
-    // ...existing code...
 
     const logout = () => {
         setUser(null);
