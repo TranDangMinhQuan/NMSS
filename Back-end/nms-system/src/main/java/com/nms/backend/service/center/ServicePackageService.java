@@ -14,6 +14,9 @@ public interface ServicePackageService {
 
     ServicePackageDTO getById(Long id);
 
+    // Lấy tất cả packages
+    List<ServicePackageDTO> getAll();
+
     // Lấy danh sách package theo center
     List<ServicePackageDTO> getByCenter(Long centerId);
 

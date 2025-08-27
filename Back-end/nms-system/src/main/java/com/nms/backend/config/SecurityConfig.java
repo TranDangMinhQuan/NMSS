@@ -43,6 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationServiceImpl authenticationServiceImpl) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔥 bật cors ở đây
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()
@@ -56,7 +57,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5432")); // frontend
+        config.setAllowedOrigins(List.of("http://localhost:5173")); // frontend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // cho phép gửi cookie / token

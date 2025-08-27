@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -22,11 +22,10 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      const user = await login(formData as { username: string; password: string });
+      const user = await login({ email: formData.email, password: formData.password });
       if (user && user.role === 'member') {
-        navigate('/member-services'); // Redirect member to member-services page
+        navigate('/member-services');
       } else if (user) {
         navigate('/dashboard');
       }
@@ -70,19 +69,19 @@ const LoginPage: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Tên đăng nhập
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
               </label>
               <div className="mt-1">
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  value={formData.username}
+                  value={formData.email}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="Nhập tên đăng nhập"
+                  placeholder="Nhập email"
                 />
               </div>
             </div>
@@ -185,15 +184,7 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Demo Accounts */}
-          {/* <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Tài khoản demo:</h4>
-            <div className="space-y-1 text-xs text-gray-600">
-              <div><strong>Admin:</strong> admin / password</div>
-              <div><strong>Staff:</strong> staff / password</div>
-              <div><strong>Member:</strong> member / password</div>
-            </div>
-          </div> */}
+          {/* ...existing code... */}
         </div>
       </div>
     </div>

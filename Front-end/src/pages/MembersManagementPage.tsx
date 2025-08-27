@@ -1,67 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import type { Account } from '../types';
+import { getAccountsByRole, type AccountResponse } from '../services/api';
 
 const MembersManagementPage: React.FC = () => {
-  const [members, setMembers] = useState<Account[]>([]);
+  const [members, setMembers] = useState<AccountResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'banned'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'ACTIVE' | 'INACTIVE' | 'BANNED'>('all');
 
-  // Mock data
+  // Load members from BE (ADMIN only endpoint)
   useEffect(() => {
-    setTimeout(() => {
-      const mockMembers: Account[] = [
-        {
-          account_id: '1',
-          username: 'nguyenvana',
-          email: 'nguyenvana@email.com',
-          phone: '0123456789',
-          role: 'member',
-          status: 'active',
-          created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z',
-        },
-        {
-          account_id: '2',
-          username: 'tranthib',
-          email: 'tranthib@email.com',
-          phone: '0987654321',
-          role: 'member',
-          status: 'active',
-          created_at: '2024-01-10T14:20:00Z',
-          updated_at: '2024-01-10T14:20:00Z',
-        },
-        {
-          account_id: '3',
-          username: 'levanc',
-          email: 'levanc@email.com',
-          phone: '0369852147',
-          role: 'member',
-          status: 'inactive',
-          created_at: '2024-01-05T09:15:00Z',
-          updated_at: '2024-01-05T09:15:00Z',
-        },
-      ];
-      setMembers(mockMembers);
-      setLoading(false);
-    }, 1000);
+    const fetchMembers = async () => {
+      try {
+        const data = await getAccountsByRole('MEMBER');
+        setMembers(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMembers();
   }, []);
 
   const filteredMembers = members.filter(member => {
-    const matchesSearch = member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.phone.includes(searchTerm);
+    const name = (member.fullName || '').toLowerCase();
+    const email = (member.email || '').toLowerCase();
+    const phone = (member.phone || '');
+    const matchesSearch = name.includes(searchTerm.toLowerCase()) ||
+                         email.includes(searchTerm.toLowerCase()) ||
+                         phone.includes(searchTerm);
     const matchesStatus = filterStatus === 'all' || member.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      active: { color: 'bg-green-100 text-green-800', text: 'Hoạt động' },
-      inactive: { color: 'bg-gray-100 text-gray-800', text: 'Không hoạt động' },
-      banned: { color: 'bg-red-100 text-red-800', text: 'Bị cấm' },
+      ACTIVE: { color: 'bg-green-100 text-green-800', text: 'Hoạt động' },
+      INACTIVE: { color: 'bg-gray-100 text-gray-800', text: 'Không hoạt động' },
+      BANNED: { color: 'bg-red-100 text-red-800', text: 'Bị cấm' },
     };
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.inactive;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.INACTIVE;
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
         {config.text}
@@ -71,12 +47,11 @@ const MembersManagementPage: React.FC = () => {
 
   const getRoleBadge = (role: string) => {
     const roleConfig = {
-      admin: { color: 'bg-purple-100 text-purple-800', text: 'Admin' },
-      staff: { color: 'bg-blue-100 text-blue-800', text: 'Nhân viên' },
-      member: { color: 'bg-green-100 text-green-800', text: 'Thành viên' },
-      guest: { color: 'bg-gray-100 text-gray-800', text: 'Khách' },
+      ADMIN: { color: 'bg-purple-100 text-purple-800', text: 'Admin' },
+      STAFF: { color: 'bg-blue-100 text-blue-800', text: 'Nhân viên' },
+      MEMBER: { color: 'bg-green-100 text-green-800', text: 'Thành viên' },
     };
-    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.guest;
+    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.MEMBER;
     return (
       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
         {config.text}
@@ -133,9 +108,9 @@ const MembersManagementPage: React.FC = () => {
               className="input-field"
             >
               <option value="all">Tất cả</option>
-              <option value="active">Hoạt động</option>
-              <option value="inactive">Không hoạt động</option>
-              <option value="banned">Bị cấm</option>
+              <option value="ACTIVE">Hoạt động</option>
+              <option value="INACTIVE">Không hoạt động</option>
+              <option value="BANNED">Bị cấm</option>
             </select>
           </div>
           <div className="flex items-end">
@@ -180,23 +155,23 @@ const MembersManagementPage: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredMembers.map((member) => (
-                <tr key={member.account_id} className="hover:bg-gray-50">
+                <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                         <span className="text-primary-600 font-medium text-sm">
-                          {member.username.charAt(0).toUpperCase()}
+                          {(member.fullName || member.email || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {member.username}
+                          {member.fullName || '(Chưa có tên)'}
                         </div>
                         <div className="text-sm text-gray-500">
                           {member.email}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {member.phone}
+                          {member.phone || ''}
                         </div>
                       </div>
                     </div>
@@ -208,7 +183,7 @@ const MembersManagementPage: React.FC = () => {
                     {getStatusBadge(member.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(member.created_at).toLocaleDateString('vi-VN')}
+                    {new Date(member.createAt).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
