@@ -1,3 +1,35 @@
+export async function forgotPasswordRequest(email: string) {
+    const response = await api.post('/api/forgot-password-request', { email });
+    return response.data;
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+    const response = await api.post('/api/reset-password-request', { token, newPassword });
+    return response.data as string;
+}
+export interface MemberProfile {
+    fullName: string;
+    email: string;
+    gender: 'MALE' | 'FEMALE';
+    dateOfBirth: string;
+    cccd: string;
+    phone: string;
+    address: string;
+    status: string;
+}
+
+export async function getMemberProfile() {
+    // Backend profile endpoint is GET /api/account/view-profile
+    const response = await api.get<MemberProfile>('/api/account/view-profile');
+    return response.data;
+}
+
+export async function updateMemberProfile(data: Partial<MemberProfile>) {
+    // Backend returns 200 with no body for this endpoint, so refetch profile afterwards
+    await api.put<void>('/api/account/member/profile', data);
+    const refreshed = await getMemberProfile();
+    return refreshed;
+}
 import axios from 'axios';
 
 const api = axios.create({
@@ -9,17 +41,19 @@ const api = axios.create({
 
 // Attach Authorization header from localStorage token
 api.interceptors.request.use((config) => {
-    try {
-        const savedUser = localStorage.getItem('nvh_user');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            if (user?.token) {
-                config.headers = config.headers || {};
-                config.headers['Authorization'] = `Bearer ${user.token}`;
-            }
-        }
-    } catch {}
-    return config;
+  try {
+    const savedUser = localStorage.getItem('nvh_user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      if (user?.token) {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${user.token}`;
+      }
+    }
+  } catch {
+    // Ignore errors reading/parsing localStorage token
+  }
+  return config;
 });
 
 export async function login(email: string, password: string) {

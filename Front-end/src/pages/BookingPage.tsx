@@ -1,19 +1,41 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+// Toast component đơn giản
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 2500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+      {message}
+    </div>
+  );
+}
 import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const BookingPage: React.FC = () => {
-  const [selectedService, setSelectedService] = useState('');
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialService = searchParams.get('service') || '';
+  const [selectedService, setSelectedService] = useState(initialService);
+  useEffect(() => {
+    // Nếu có initialService và chưa set thì set lại
+    if (initialService && !selectedService) {
+      setSelectedService(initialService);
+    }
+  }, [initialService, selectedService]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedDuration, setSelectedDuration] = useState('1');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const { user } = useAuth();
 
   const services = [
-    { id: 'gym', name: 'Phòng Gym', price: 200000 },
-    { id: 'bowling', name: 'Bowling', price: 80000 },
+    { id: 'gym', name: 'Phòng Gym', priceNormal: 200000, pricePeak: 250000 },
+    { id: 'bowling', name: 'Bowling', priceNormal: 80000, pricePeak: 120000 },
   ];
 
   const timeSlots = [
@@ -28,8 +50,26 @@ const BookingPage: React.FC = () => {
     { value: '4', label: '4 giờ' },
   ];
 
+  const [selectedPriceType, setSelectedPriceType] = useState<'normal' | 'peak'>('normal');
+
+  // Tự động xác định khung giờ thường/cao điểm dựa vào selectedTime
+  useEffect(() => {
+    if (!selectedTime) return;
+    // Giờ cao điểm: 17:00 - 21:00
+    const peakHours = ['17:00', '18:00', '19:00', '20:00', '21:00'];
+    if (peakHours.includes(selectedTime)) {
+      setSelectedPriceType('peak');
+    } else {
+      setSelectedPriceType('normal');
+    }
+  }, [selectedTime]);
   const selectedServiceData = services.find(s => s.id === selectedService);
-  const totalPrice = selectedServiceData ? selectedServiceData.price * parseInt(selectedDuration) : 0;
+  const pricePerHour = selectedServiceData
+    ? selectedPriceType === 'normal'
+      ? selectedServiceData.priceNormal
+      : selectedServiceData.pricePeak
+    : 0;
+  const totalPrice = pricePerHour * parseInt(selectedDuration);
 
   const isMember = useMemo(() => user?.role === 'member', [user]);
 
@@ -41,8 +81,7 @@ const BookingPage: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
       if (!isMember) {
-        // Non-members cannot proceed to payment; prompt login
-        alert('Vui lòng đăng nhập bằng tài khoản thành viên để thanh toán.');
+        setToastMsg('Vui lòng đăng nhập bằng tài khoản thành viên để thanh toán.');
         return;
       }
       if (!selectedServiceData) return;
@@ -52,7 +91,7 @@ const BookingPage: React.FC = () => {
           booking: {
             serviceId: selectedServiceData.id.toString(),
             serviceName: selectedServiceData.name,
-            pricePerHour: selectedServiceData.price,
+            pricePerHour: pricePerHour,
             date: selectedDate,
             time: selectedTime,
             durationHours: parseInt(selectedDuration),
@@ -64,6 +103,7 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Đặt chỗ dịch vụ</h1>
@@ -79,24 +119,51 @@ const BookingPage: React.FC = () => {
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Service Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Chọn dịch vụ *
-              </label>
-              <select
-                value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                required
-                className="input-field"
-              >
-                <option value="">-- Chọn dịch vụ --</option>
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name} - {service.price.toLocaleString()} VNĐ/giờ
-                  </option>
-                ))}
-              </select>
-            </div>
+            {initialService ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Dịch vụ đã chọn</label>
+                <div className="px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-semibold min-h-[24px] flex items-center">
+                  {selectedServiceData?.name || 'Không xác định'}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label htmlFor="service-select" className="block text-sm font-medium text-gray-700 mb-2">
+                  Chọn dịch vụ *
+                </label>
+                <select
+                  id="service-select"
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                  required
+                  className="input-field"
+                >
+                  <option value="">-- Chọn dịch vụ --</option>
+                  {services.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Price Type Display (tự động xác định) */}
+            {selectedServiceData && selectedTime && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Khung giờ áp dụng
+                </label>
+                <div className="flex gap-4">
+                  <span className={`px-4 py-2 rounded-lg font-medium border ${selectedPriceType === 'normal' ? 'bg-primary-600 text-white border-primary-600' : 'bg-gray-100 text-gray-700 border-gray-300'}`}>
+                    Giờ thường ({selectedServiceData.priceNormal.toLocaleString()} VNĐ/giờ)
+                  </span>
+                  <span className={`px-4 py-2 rounded-lg font-medium border ${selectedPriceType === 'peak' ? 'bg-primary-600 text-white border-primary-600' : 'bg-gray-100 text-gray-700 border-gray-300'}`}>
+                    Giờ cao điểm ({selectedServiceData.pricePeak.toLocaleString()} VNĐ/giờ)
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Date Selection */}
             <div>
@@ -104,6 +171,7 @@ const BookingPage: React.FC = () => {
                 Chọn ngày *
               </label>
               <input
+                id="date-select"
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
@@ -119,6 +187,7 @@ const BookingPage: React.FC = () => {
                 Chọn giờ *
               </label>
               <select
+                id="time-select"
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
                 required
@@ -139,6 +208,7 @@ const BookingPage: React.FC = () => {
                 Thời lượng *
               </label>
               <select
+                id="duration-select"
                 value={selectedDuration}
                 onChange={(e) => setSelectedDuration(e.target.value)}
                 required
@@ -164,7 +234,10 @@ const BookingPage: React.FC = () => {
                   Đang xử lý...
                 </div>
               ) : (
-                isMember ? 'Xác nhận & thanh toán' : 'Xác nhận đặt chỗ'
+                (() => {
+                  if (isMember) return 'Xác nhận & thanh toán';
+                  return 'Xác nhận đặt chỗ';
+                })()
               )}
             </button>
           </form>
@@ -196,7 +269,7 @@ const BookingPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Đơn giá:</span>
-                  <span className="font-medium">{selectedServiceData.price.toLocaleString()} VNĐ/giờ</span>
+                  <span className="font-medium">{pricePerHour.toLocaleString()} VNĐ/giờ</span>
                 </div>
                 <hr />
                 <div className="flex justify-between items-center text-lg font-bold">
@@ -220,7 +293,7 @@ const BookingPage: React.FC = () => {
                 Đặt chỗ trước ít nhất 2 giờ để đảm bảo có chỗ
               </li>
               <li className="flex items-start">
-                <span className="text-blue-600 mr-2">•</span>
+                <span className="text-blue-600 mr-2">•</span>&nbsp;
                 Có thể hủy đặt chỗ trước 1 giờ mà không bị phạt
               </li>
               <li className="flex items-start">
