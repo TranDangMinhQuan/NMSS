@@ -17,4 +17,8 @@ public class NmsApplication {
     public static void main(String[] args) {
         SpringApplication.run(NmsApplication.class, args);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 7313e38 (Quan update logic backend)
