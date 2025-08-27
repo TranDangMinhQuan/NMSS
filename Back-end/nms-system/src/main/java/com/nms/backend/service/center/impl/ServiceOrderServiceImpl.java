@@ -2,6 +2,7 @@ package com.nms.backend.service.center.impl;
 
 import com.nms.backend.dto.center.ServiceOrderRequestDTO;
 import com.nms.backend.dto.center.ServiceOrderResponseDTO;
+import com.nms.backend.dto.membership.PaymentDTO;
 import com.nms.backend.entity.auth.Account;
 import com.nms.backend.entity.center.ServiceDetails;
 import com.nms.backend.entity.center.ServicePackage;
@@ -11,6 +12,7 @@ import com.nms.backend.entity.membership.Card;
 import com.nms.backend.entity.membership.CardPackage;
 import com.nms.backend.enums.CardStatus;
 import com.nms.backend.enums.OrderStatus;
+import com.nms.backend.enums.PaymentStatus;
 import com.nms.backend.repository.auth.AccountRepository;
 import com.nms.backend.repository.center.ServiceDetailRepository;
 import com.nms.backend.repository.center.ServicePackageRepository;
@@ -18,11 +20,14 @@ import com.nms.backend.repository.center.ServiceTypeRepository;
 import com.nms.backend.repository.center.ServiceOrderRepository;
 import com.nms.backend.repository.membership.CardPackageRepository;
 import com.nms.backend.repository.membership.CardRepository;
+import com.nms.backend.repository.membership.PaymentRepository;
 import com.nms.backend.service.center.ServiceOrderService;
+import com.nms.backend.service.membership.PaymentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,6 +59,11 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PaymentRepository paymentRepo;
+    @Autowired
+    private PaymentService paymentService;
 
     @Override
     public ServiceOrderResponseDTO createServiceOrder(ServiceOrderRequestDTO dto,Long currentUserId ) {
@@ -88,6 +98,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         // Lưu ServiceOrder
         ServiceOrder savedOrder = orderRepo.save(order);
 
+        //tạo payement
+        PaymentDTO paymentDTO = PaymentDTO.builder()
+                .serviceOrderId(savedOrder.getId())
+                .amount(BigDecimal.valueOf(savedOrder.getServiceDetails().getBasePrice()))
+                .status(PaymentStatus.PENDING)
+                .build();
+
+        paymentService.createPayment(paymentDTO);
         // Trừ lượt sử dụng (chỉ khi order được duyệt)
         // Logic trừ lượt sẽ nằm trong phương thức updateOrderStatus
 
