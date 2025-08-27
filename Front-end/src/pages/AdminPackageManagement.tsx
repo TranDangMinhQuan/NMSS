@@ -18,6 +18,8 @@ const AdminPackageManagement: React.FC = () => {
           console.log('[AdminPackageManagement] packages payload sample:', Array.isArray(data) ? data[0] : data);
         } catch {}
         setPackages(data);
+      } catch (error) {
+        console.error('Failed to fetch packages:', error);
       } finally {
         setLoading(false);
       }
@@ -72,7 +74,7 @@ const AdminPackageManagement: React.FC = () => {
   };
 
   // Resilient accessors to support camelCase or snake_case and flexible value types
-  const parseBoolean = (val: any): boolean | undefined => {
+  const parseBoolean = (val: unknown): boolean | undefined => {
     if (typeof val === 'boolean') return val;
     if (typeof val === 'number') return val !== 0;
     if (typeof val === 'string') {
@@ -83,13 +85,32 @@ const AdminPackageManagement: React.FC = () => {
     return undefined;
   };
 
+<<<<<<< HEAD
 
   const getDayConstraints = (pkg: any): string => pkg?.dayConstraints ?? pkg?.day_constraints ?? '';
   const getStatus = (pkg: any): boolean => {
     const val = pkg?.status ?? pkg?.is_active ?? pkg?.active;
+=======
+  const parseNumber = (val: unknown): number | undefined => {
+    if (typeof val === 'number') return Number.isFinite(val) ? val : undefined;
+    if (typeof val === 'string') {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : undefined;
+    }
+    return undefined;
+  };
+
+  const getDayConstraints = (pkg: ServicePackageDTO): string => pkg?.dayConstraints ?? (pkg as any)?.day_constraints ?? '';
+  const getMaxUsesPerDay = (pkg: ServicePackageDTO): number | undefined => {
+    const val = (pkg as ServicePackageDTO & { max_uses_per_day?: unknown })?.maxUsesPerDay ?? (pkg as any)?.max_uses_per_day;
+    return parseNumber(val);
+  };
+  const getStatus = (pkg: ServicePackageDTO): boolean => {
+    const val = (pkg as ServicePackageDTO & { is_active?: unknown; active?: unknown }).status ?? (pkg as any).is_active ?? (pkg as any).active;
+>>>>>>> b60b9a8f3607b7836ce73051b5e376640d9ab455
     const parsed = parseBoolean(val);
     // BE list endpoint returns only active packages; when field absent, assume active
-    return parsed === undefined ? true : parsed;
+    return parsed ?? true;
   };
 
   if (loading) {
@@ -264,8 +285,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Tên gói dịch vụ</label>
+              <label htmlFor="packageName" className="block text-sm font-medium text-gray-700">Tên gói dịch vụ</label>
               <input
+                id="packageName"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -278,8 +300,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Giá tối thiểu (VNĐ)</label>
+                <label htmlFor="minPrice" className="block text-sm font-medium text-gray-700">Giá tối thiểu (VNĐ)</label>
                 <input
+                  id="minPrice"
                   type="number"
                   value={formData.minPrice}
                   onChange={(e) => setFormData({...formData, minPrice: Number(e.target.value)})}
@@ -289,8 +312,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
               </div>
 
               <div>
-                <label className="block textsm font-medium text-gray-700">Giá tối đa (VNĐ)</label>
+                <label htmlFor="maxPrice" className="block text-sm font-medium text-gray-700">Giá tối đa (VNĐ)</label>
                 <input
+                  id="maxPrice"
                   type="number"
                   value={formData.maxPrice}
                   onChange={(e) => setFormData({...formData, maxPrice: Number(e.target.value)})}
@@ -302,8 +326,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Số buổi</label>
+                <label htmlFor="totalSessions" className="block text-sm font-medium text-gray-700">Số buổi</label>
                 <input
+                  id="totalSessions"
                   type="number"
                   value={formData.totalSessions}
                   onChange={(e) => setFormData({...formData, totalSessions: Number(e.target.value)})}
@@ -313,8 +338,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Thời lượng tối đa/buổi (phút)</label>
+                <label htmlFor="maxDurationMinutes" className="block text-sm font-medium text-gray-700">Thời lượng tối đa/buổi (phút)</label>
                 <input
+                  id="maxDurationMinutes"
                   type="number"
                   value={formData.maxDurationMinutes}
                   onChange={(e) => setFormData({...formData, maxDurationMinutes: Number(e.target.value)})}
@@ -325,7 +351,7 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Ngày được phép sử dụng</label>
+              <label htmlFor="allowedDays" className="block text-sm font-medium text-gray-700">Ngày được phép sử dụng</label>
               <div className="mt-2 flex space-x-2">
                 {dayLabels.map((day, index) => (
                   <button
@@ -346,8 +372,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Ngày được phép (hiển thị)</label>
+                <label htmlFor="allowedDaysDisplay" className="block text-sm font-medium text-gray-700">Ngày được phép (hiển thị)</label>
                 <input
+                  id="allowedDaysDisplay"
                   type="text"
                   value={formData.dayConstraints}
                   readOnly
@@ -362,8 +389,9 @@ const PackageModal: React.FC<PackageModalProps> = ({ package: pkg, onSave, onClo
 
             {pkg && (
               <div>
-                <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700">Trạng thái</label>
                 <select
+                  id="status"
                   value={String(formData.status)}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value === 'true' })}
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"

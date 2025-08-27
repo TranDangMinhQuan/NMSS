@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ServicePackageRepository extends JpaRepository<ServicePackage, Long> {
-    List<ServicePackage> findAllByStatusTrue();
+    List<ServicePackage> findByStatusTrue();   // active
+    List<ServicePackage> findByStatusFalse();  // soft delete
+
 }

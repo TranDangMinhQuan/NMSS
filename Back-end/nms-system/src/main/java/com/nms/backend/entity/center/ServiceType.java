@@ -1,31 +1,33 @@
 package com.nms.backend.entity.center;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.Nationalized;
+import lombok.*;
+import java.util.List;
 
-@Data
 @Entity
-@Table(name = "ServiceType")
+@Table(name = "service_types")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ServiceType {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Nationalized
-    @Column(name = "Name", nullable = false)
-    private String name;
+    @Column(nullable = false)
+    private String name; // Ví dụ: "Thể thao", "Nghệ thuật"
 
-    @Column(name = "Description")
-    @Nationalized
-    private String description;
-
-    // Mỗi loại dịch vụ thuộc 1 trung tâm
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "center_id")
+    @ManyToOne
+    @JoinColumn(name = "center_id", nullable = false)
     private Center center;
+
+
+    @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceDetails> serviceDetails;
 
     @Column(name = "Status")
     private Boolean status = true; // active or soft delete
+
 }

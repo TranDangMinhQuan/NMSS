@@ -1,12 +1,14 @@
 package com.nms.backend.dto.center;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ServiceTypeDTO {
     private Long id;
     private String name;
-    private String description;
-    private Long centerId;
-    private Boolean status;
+    private Long centerId; // để tham chiếu đến Center
 }

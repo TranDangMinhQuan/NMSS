@@ -10,3 +10,4 @@ import java.util.List;
 public interface CenterRepository extends JpaRepository<Center, Long> {
     List<Center> findAllByDeletedFalse();
 }
+

@@ -6,79 +6,76 @@ import com.nms.backend.entity.center.ServiceType;
 import com.nms.backend.repository.center.CenterRepository;
 import com.nms.backend.repository.center.ServiceTypeRepository;
 import com.nms.backend.service.center.ServiceTypeService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceTypeServiceImpl implements ServiceTypeService {
 
-    @Autowired
-    private ServiceTypeRepository serviceTypeRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final CenterRepository centerRepository;
 
-    @Autowired
-    private CenterRepository centerRepository;
+    private ServiceTypeDTO mapToDTO(ServiceType entity) {
+        return ServiceTypeDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .centerId(entity.getCenter().getId())
+                .build();
+    }
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private ServiceType mapToEntity(ServiceTypeDTO dto) {
+        Center center = centerRepository.findById(dto.getCenterId())
+                .orElseThrow(() -> new RuntimeException("Center not found"));
+        return ServiceType.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .center(center)
+                .build();
+    }
 
     @Override
     public ServiceTypeDTO create(ServiceTypeDTO dto) {
-        ServiceType serviceType = new ServiceType();
-        serviceType.setName(dto.getName());
-        serviceType.setDescription(dto.getDescription());
-        serviceType.setStatus(true);
-
-        // Lấy center
-        Center center = centerRepository.findById(dto.getCenterId())
-                .orElseThrow(() -> new IllegalArgumentException("Center not found"));
-        serviceType.setCenter(center);
-
-        ServiceType saved = serviceTypeRepository.save(serviceType);
-        return modelMapper.map(saved, ServiceTypeDTO.class);
+        ServiceType entity = mapToEntity(dto);
+        return mapToDTO(serviceTypeRepository.save(entity));
     }
 
     @Override
     public ServiceTypeDTO update(Long id, ServiceTypeDTO dto) {
-        ServiceType serviceType = serviceTypeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ServiceType not found"));
+        ServiceType entity = serviceTypeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("ServiceType not found"));
+        entity.setName(dto.getName());
 
-        serviceType.setName(dto.getName());
-        serviceType.setDescription(dto.getDescription());
-
-        if (dto.getCenterId() != null) {
+        if (dto.getCenterId() != null && !dto.getCenterId().equals(entity.getCenter().getId())) {
             Center center = centerRepository.findById(dto.getCenterId())
-                    .orElseThrow(() -> new IllegalArgumentException("Center not found"));
-            serviceType.setCenter(center);
+                    .orElseThrow(() -> new RuntimeException("Center not found"));
+            entity.setCenter(center);
         }
 
-        ServiceType updated = serviceTypeRepository.save(serviceType);
-        return modelMapper.map(updated, ServiceTypeDTO.class);
+        return mapToDTO(serviceTypeRepository.save(entity));
     }
 
     @Override
     public void delete(Long id) {
-        ServiceType serviceType = serviceTypeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ServiceType not found"));
-        serviceType.setStatus(false); // soft delete
-        serviceTypeRepository.save(serviceType);
+        if (!serviceTypeRepository.existsById(id)) {
+            throw new RuntimeException("ServiceType not found");
+        }
+        serviceTypeRepository.deleteById(id);
     }
 
     @Override
     public ServiceTypeDTO getById(Long id) {
-        ServiceType serviceType = serviceTypeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ServiceType not found"));
-        return modelMapper.map(serviceType, ServiceTypeDTO.class);
+        return serviceTypeRepository.findById(id)
+                .map(this::mapToDTO)
+                .orElseThrow(() -> new RuntimeException("ServiceType not found"));
     }
 
     @Override
-    public List<ServiceTypeDTO> getAllByCenter(Long centerId) {
-        List<ServiceType> list = serviceTypeRepository.findAllByCenterIdAndStatusTrue(centerId);
-        return list.stream()
-                .map(st -> modelMapper.map(st, ServiceTypeDTO.class))
-                .collect(Collectors.toList());
+    public List<ServiceTypeDTO> getByCenter(Long centerId) {
+        return serviceTypeRepository.findByCenter_Id(centerId)
+                .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 }

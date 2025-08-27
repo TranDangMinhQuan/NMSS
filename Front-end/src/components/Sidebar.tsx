@@ -64,24 +64,21 @@ const Sidebar: React.FC = () => {
   ];
 
   // Staff only items (Admin không có)
-  const staffItems = [
-    {
-      name: 'Đặt chỗ',
-      href: '/booking',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
-  ];
 
   // Admin only items
   // Đã xóa adminItems vì không còn mục riêng cho admin ngoài dropdown Thành viên
 
   // Logic để hiển thị menu theo role
-  // Không cần allItems nữa, render trực tiếp navItems, staffItems, 
-  // và dropdown Thành viên cho admin
+  let allItems = [...navItems];
+  
+  if (user?.role === 'admin') {
+    // Admin: navItems + adminItems
+    allItems = [...navItems, ...adminItems];
+  } else if (user?.role === 'staff') {
+    // Staff: navItems (không có staffItems vì không còn booking)
+    allItems = [...navItems];
+  }
+  // Member và các role khác chỉ có navItems cơ bản
 
   return (
     <aside className="w-64 bg-white shadow-lg border-r border-gray-200 min-h-screen flex flex-col">

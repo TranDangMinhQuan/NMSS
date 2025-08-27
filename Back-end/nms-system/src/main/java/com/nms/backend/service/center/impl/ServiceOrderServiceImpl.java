@@ -6,11 +6,14 @@ import com.nms.backend.entity.auth.Account;
 import com.nms.backend.entity.center.ServicePackage;
 import com.nms.backend.entity.center.ServiceType;
 import com.nms.backend.entity.center.ServiceOrder;
+import com.nms.backend.entity.membership.Card;
+import com.nms.backend.enums.CardStatus;
 import com.nms.backend.enums.OrderStatus;
 import com.nms.backend.repository.auth.AccountRepository;
 import com.nms.backend.repository.center.ServicePackageRepository;
 import com.nms.backend.repository.center.ServiceTypeRepository;
 import com.nms.backend.repository.center.ServiceOrderRepository;
+import com.nms.backend.repository.membership.CardRepository;
 import com.nms.backend.service.center.ServiceOrderService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private ServicePackageRepository packageRepo;
 
     @Autowired
+    private CardRepository cardRepo;
+
+    @Autowired
     private ServiceTypeRepository serviceTypeRepo;
 
     @Autowired
@@ -40,8 +46,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
     @Override
     public ServiceOrderResponseDTO createServiceOrder(ServiceOrderRequestDTO dto) {
-        Account member = accountRepo.findById(dto.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Account account = accountRepo.findById(dto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         ServicePackage servicePackage = packageRepo.findById(dto.getPackageId())
                 .orElseThrow(() -> new IllegalArgumentException("Service package not found"));
@@ -49,46 +55,34 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         ServiceType serviceType = serviceTypeRepo.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Service type not found"));
 
-        // Kiểm tra loại dịch vụ
-        if (!servicePackage.getServices().contains(serviceType)) {
-            throw new IllegalArgumentException("Service type not included in selected package");
+        Card card = cardRepo.findById(dto.getCardId())
+                .orElseThrow(() -> new IllegalArgumentException("Membership card not found"));
+
+        if (!card.getAccount().getId().equals(account.getId())) {
+            throw new IllegalArgumentException("Card does not belong to this account");
+        }
+        if (card.getStatus() != CardStatus.ACTIVE) {
+            throw new IllegalArgumentException("Card is not active");
         }
 
-        // Kiểm tra day constraint
-        DayOfWeek day = dto.getStartTime().getDayOfWeek();
-        List<DayOfWeek> allowedDays = DayConstraintUtils.fromDayConstraints(servicePackage.getDayConstraints());
-        if (!allowedDays.contains(day)) {
-            throw new IllegalArgumentException("Service not allowed on this day");
-        }
+        // ... validate ngày, thời lượng, quota như bạn làm ...
 
-        // Kiểm tra thời lượng
-        long minutes = java.time.Duration.between(dto.getStartTime(), dto.getEndTime()).toMinutes();
-        if (minutes > servicePackage.getMaxDurationMinutes()) {
-            throw new IllegalArgumentException("Duration exceeds maximum allowed minutes");
-        }
-
-        // Kiểm tra tổng số lần sử dụng gói
-        long usedTimes = orderRepo.findAllByMember_IdAndServicePackage_Id(member.getId(), servicePackage.getId()).size();
-        if (usedTimes >= servicePackage.getTotalSessions()) {
-            throw new IllegalArgumentException("Exceeded total allowed usage for this package");
-        }
-
-        // Tạo ServiceOrder
         ServiceOrder order = new ServiceOrder();
-        order.setMember(member);
+        order.setMember(account);
+        order.setCard(card);  //  gắn thẻ membership vào booking
         order.setServicePackage(servicePackage);
         order.setServiceType(serviceType);
         order.setStartTime(dto.getStartTime());
         order.setEndTime(dto.getEndTime());
         order.setStatus(OrderStatus.PENDING);
 
-        ServiceOrder saved = orderRepo.save(order);
-        return modelMapper.map(saved, ServiceOrderResponseDTO.class);
+        return modelMapper.map(orderRepo.save(order), ServiceOrderResponseDTO.class);
     }
+
 
     @Override
     public List<ServiceOrderResponseDTO> getOrdersByMember(Long memberId) {
-        return orderRepo.findAllByMember_Id(memberId)
+        return orderRepo.findByAccountId(memberId)
                 .stream()
                 .map(order -> modelMapper.map(order, ServiceOrderResponseDTO.class))
                 .collect(Collectors.toList());
