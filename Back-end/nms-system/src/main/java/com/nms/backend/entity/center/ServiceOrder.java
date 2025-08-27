@@ -2,6 +2,7 @@ package com.nms.backend.entity.center;
 
 
 import com.nms.backend.entity.auth.Account;
+import com.nms.backend.entity.membership.Card;
 import com.nms.backend.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,6 +22,10 @@ public class ServiceOrder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Account member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "card_id")
+    private Card card;
 
     // Gói dịch vụ
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,6 +1,5 @@
 package com.nms.backend.config;
 
-
 import com.nms.backend.service.auth.impl.AuthenticationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,27 +31,25 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Tách riêng AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
-    // Không cần AuthenticationServiceImpl ở đây nữa
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationServiceImpl authenticationServiceImpl) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔥 bật cors ở đây
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .userDetailsService(authenticationServiceImpl)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

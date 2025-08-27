@@ -47,6 +47,7 @@ public class Filter extends OncePerRequestFilter {
             "GET:/swagger-resources/**",
             "GET:/webjars/**",
             "GET:/swagger-ui.html",
+            "GET:/favicon.ico",
             "POST:/api/auth/forgot-password",
             "POST:/api/auth/reset-password",
             "GET:/ws/**"

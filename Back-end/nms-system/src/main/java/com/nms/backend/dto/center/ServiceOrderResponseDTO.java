@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class ServiceOrderResponseDTO {
     private Long id;
     private String memberName;
+    private String cardNumber;
     private String packageName;
     private String serviceTypeName;
     private LocalDateTime startTime;

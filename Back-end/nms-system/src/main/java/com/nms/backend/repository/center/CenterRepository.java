@@ -9,10 +9,8 @@ import java.util.Optional;
 @Repository
 public interface CenterRepository extends JpaRepository<Center, Long> {
     Optional<Center> findByIdAndDeletedFalse(Long id);
-
     List<Center> findByNameAndDeletedFalse(String name);
-
     List<Center> findByPhoneAndDeletedFalse(String phone);
-
     List<Center> findByAddressAndDeletedFalse(String address);
 }
+

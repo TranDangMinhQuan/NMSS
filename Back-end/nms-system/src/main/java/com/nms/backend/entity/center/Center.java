@@ -1,30 +1,31 @@
 package com.nms.backend.entity.center;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.Nationalized;
-
-@Data
+import lombok.*;
+import java.util.List;
 @Entity
-@Table(name = "Centers")
+@Table(name = "centers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Center {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Center_Id")
     private Long id;
 
-    @Column(name = "Name")
-    @Nationalized
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(name = "Address")
-    @Nationalized
     private String address;
 
-    @Column(name = "Phone", unique = true)
+    @Column(unique = true)
     private String phone;
 
-    @Column(name = "Deleted", nullable = false)
-    private Boolean deleted = false; // soft delete
+    @Column(nullable = false)
+    private Boolean deleted = false; // soft delete flag
+
+    @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ServiceType> serviceTypes;
 }
