@@ -6,6 +6,9 @@ import DashboardPage from './pages/DashboardPage';
 import { useAuth } from './hooks/useAuth';
 
 // Lazy load pages for better performance
+const AdminAccountsPage = React.lazy(() => import('./pages/AdminAccountsPage'));
+const StaffAccountsPage = React.lazy(() => import('./pages/StaffAccountsPage'));
+const MemberAccountsPage = React.lazy(() => import('./pages/MemberAccountsPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage'));
 const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const AdminServiceManagement = React.lazy(() => import('./pages/AdminServiceManagement'));
@@ -163,7 +166,34 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
 
-          {/* Admin/Staff Routes */}
+          {/* Account Management Routes */}
+          <Route path="/accounts/admin" element={
+            <ProtectedRoute roles={["admin"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <AdminAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/accounts/staff" element={
+            <ProtectedRoute roles={["admin", "staff"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <StaffAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/accounts/member" element={
+            <ProtectedRoute roles={["admin", "staff"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <MemberAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/members" element={
             <ProtectedRoute roles={['admin', 'staff']}>
               <MainLayout>

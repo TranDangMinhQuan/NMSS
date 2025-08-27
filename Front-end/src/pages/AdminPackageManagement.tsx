@@ -83,20 +83,8 @@ const AdminPackageManagement: React.FC = () => {
     return undefined;
   };
 
-  const parseNumber = (val: any): number | undefined => {
-    if (typeof val === 'number') return Number.isFinite(val) ? val : undefined;
-    if (typeof val === 'string') {
-      const n = Number(val);
-      return Number.isFinite(n) ? n : undefined;
-    }
-    return undefined;
-  };
 
   const getDayConstraints = (pkg: any): string => pkg?.dayConstraints ?? pkg?.day_constraints ?? '';
-  const getMaxUsesPerDay = (pkg: any): number | undefined => {
-    const val = pkg?.maxUsesPerDay ?? pkg?.max_uses_per_day;
-    return parseNumber(val);
-  };
   const getStatus = (pkg: any): boolean => {
     const val = pkg?.status ?? pkg?.is_active ?? pkg?.active;
     const parsed = parseBoolean(val);
@@ -155,9 +143,6 @@ const AdminPackageManagement: React.FC = () => {
                   Thời lượng tối đa/buổi
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tối đa/ngày
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Trạng thái
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -193,11 +178,6 @@ const AdminPackageManagement: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
                       {pkg.maxDurationMinutes} phút
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {getMaxUsesPerDay(pkg) ?? '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
