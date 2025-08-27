@@ -8,7 +8,7 @@ import com.nms.backend.enums.OrderStatus;
 import java.util.List;
 
 public interface ServiceOrderService {
-    ServiceOrderResponseDTO createServiceOrder(ServiceOrderRequestDTO requestDTO);
+    ServiceOrderResponseDTO createServiceOrder(ServiceOrderRequestDTO requestDTO,Long currentUserId);
     List<ServiceOrderResponseDTO> getOrdersByMember(Long memberId);
     ServiceOrderResponseDTO updateOrderStatus(Long orderId, OrderStatus status);
 }

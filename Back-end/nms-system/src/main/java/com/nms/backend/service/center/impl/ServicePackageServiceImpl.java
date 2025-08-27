@@ -2,9 +2,10 @@ package com.nms.backend.service.center.impl;
 
 import com.nms.backend.dto.center.ServicePackageDTO;
 import com.nms.backend.entity.center.ServicePackage;
-import com.nms.backend.entity.center.ServiceType;
+import com.nms.backend.entity.center.ServiceDetails;
+import com.nms.backend.repository.center.ServiceDetailRepository;
 import com.nms.backend.repository.center.ServicePackageRepository;
-import com.nms.backend.repository.center.ServiceTypeRepository;
+
 import com.nms.backend.service.center.ServicePackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class ServicePackageServiceImpl implements ServicePackageService {
 
     private final ServicePackageRepository packageRepository;
-    private final ServiceTypeRepository serviceTypeRepository;
+    private final ServiceDetailRepository serviceDetailRepository;
 
     @Override
     public ServicePackageDTO create(ServicePackageDTO dto) {
@@ -39,7 +40,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
     public void softDelete(Long id) {
         ServicePackage entity = packageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ServicePackage not found"));
-        entity.setStatus(false); // soft delete
+        entity.setStatus(false);
         packageRepository.save(entity);
     }
 
@@ -58,14 +59,6 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         return mapEntityToDto(entity);
     }
 
-//    @Override
-//    public List<ServicePackageDTO> getAll() {
-//        List<ServicePackage> list = packageRepository.findAllByStatusTrue();
-//        return list.stream()
-//                .map(this::mapEntityToDto)
-//                .collect(Collectors.toList());
-//    }
-
     // ---------------------- Mapping Helpers ----------------------
 
     private void mapDtoToEntity(ServicePackageDTO dto, ServicePackage entity) {
@@ -77,7 +70,7 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         entity.setMaxUsesPerDay(dto.getMaxUsesPerDay());
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : true);
 
-        // convert allowedDays (List<String>) -> dayConstraints (String)
+        // Convert allowedDays (List<String>) -> dayConstraints (String)
         if (dto.getAllowedDays() != null) {
             List<DayOfWeek> days = dto.getAllowedDays().stream()
                     .map(DayOfWeek::valueOf)
@@ -85,12 +78,13 @@ public class ServicePackageServiceImpl implements ServicePackageService {
             entity.setDayConstraints(DayConstraintUtils.toDayConstraints(days));
         }
 
-        // services
+        // Lấy danh sách ServiceDetails từ các ID và gán vào entity
         if (dto.getServiceIds() != null) {
-            entity.setServices(dto.getServiceIds().stream()
-                    .map(sid -> serviceTypeRepository.findById(sid)
-                            .orElseThrow(() -> new RuntimeException("ServiceType not found: " + sid)))
-                    .collect(Collectors.toList()));
+            List<ServiceDetails> serviceDetailsList = serviceDetailRepository.findAllById(dto.getServiceIds());
+            if (serviceDetailsList.size() != dto.getServiceIds().size()) {
+                throw new RuntimeException("One or more ServiceDetails not found");
+            }
+            entity.setServiceDetails(serviceDetailsList);
         }
     }
 
@@ -105,16 +99,16 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         dto.setMaxUsesPerDay(entity.getMaxUsesPerDay());
         dto.setStatus(entity.getStatus());
 
-        // convert dayConstraints -> allowedDays
+        // Convert dayConstraints -> allowedDays
         if (entity.getDayConstraints() != null) {
             dto.setAllowedDays(DayConstraintUtils.fromDayConstraints(entity.getDayConstraints())
                     .stream().map(Enum::name).collect(Collectors.toList()));
         }
 
-        // services
-        if (entity.getServices() != null) {
-            dto.setServiceIds(entity.getServices().stream()
-                    .map(ServiceType::getId)
+        // Lấy danh sách ID của ServiceDetails để gán vào DTO
+        if (entity.getServiceDetails() != null) {
+            dto.setServiceIds(entity.getServiceDetails().stream()
+                    .map(ServiceDetails::getId)
                     .collect(Collectors.toList()));
         }
 

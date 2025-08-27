@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 @Data
 public class ServiceOrderResponseDTO {
     private Long id;
-    private String memberName;
-    private String cardNumber;
-    private String packageName;
-    private String serviceTypeName;
+    private String memberName; // Lấy từ card.account.name
+    private String cardNumber; // Lấy từ card.cardNumber
+    private String servicePackageName; // Lấy từ cardPackage.servicePackage.name
+    private String serviceDetailsName; // Lấy từ serviceDetails.name
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private OrderStatus status; // true: completed, false: pending
+    private OrderStatus status;
 }
