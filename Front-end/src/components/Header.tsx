@@ -108,7 +108,7 @@ const Header: React.FC = () => {
                   </div>
                   <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-primary-600 font-medium text-sm">
-                      {user.username.charAt(0).toUpperCase()}
+                      {user?.username ? user.username.charAt(0).toUpperCase() : ''}
                     </span>
                   </div>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

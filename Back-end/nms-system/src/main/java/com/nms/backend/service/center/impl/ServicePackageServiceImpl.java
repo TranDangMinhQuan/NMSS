@@ -58,6 +58,14 @@ public class ServicePackageServiceImpl implements ServicePackageService {
         return mapEntityToDto(entity);
     }
 
+//    @Override
+//    public List<ServicePackageDTO> getAll() {
+//        List<ServicePackage> list = packageRepository.findAllByStatusTrue();
+//        return list.stream()
+//                .map(this::mapEntityToDto)
+//                .collect(Collectors.toList());
+//    }
+
     // ---------------------- Mapping Helpers ----------------------
 
     private void mapDtoToEntity(ServicePackageDTO dto, ServicePackage entity) {

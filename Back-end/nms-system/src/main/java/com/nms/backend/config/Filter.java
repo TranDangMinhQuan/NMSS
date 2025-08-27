@@ -1,6 +1,5 @@
 package com.nms.backend.config;
 
-
 import com.nms.backend.entity.auth.Account;
 import com.nms.backend.exceptions.exceptions.AuthenticationException;
 import com.nms.backend.repository.auth.AccountRepository;
@@ -41,6 +40,9 @@ public class Filter extends OncePerRequestFilter {
     private final List<String> PUBLIC_API = List.of(
             "POST:/api/register",
             "POST:/api/login",
+            // Forgot/reset password (public)
+            "POST:/api/forgot-password-request",
+            "POST:/api/reset-password-request",
             "GET:/swagger-ui/**",
             "GET:/v3/api-docs",
             "GET:/v3/api-docs/**",
@@ -50,14 +52,14 @@ public class Filter extends OncePerRequestFilter {
             "GET:/favicon.ico",
             "POST:/api/auth/forgot-password",
             "POST:/api/auth/reset-password",
-            "GET:/ws/**"
-    );
+            "GET:/ws/**");
 
     private boolean isPublicAPI(String uri, String method) {
         AntPathMatcher matcher = new AntPathMatcher();
         return PUBLIC_API.stream().anyMatch(pattern -> {
             String[] parts = pattern.split(":", 2);
-            if (parts.length != 2) return false;
+            if (parts.length != 2)
+                return false;
             String allowedMethod = parts[0];
             String allowedUri = parts[1];
             return method.equalsIgnoreCase(allowedMethod) && matcher.match(allowedUri, uri);
@@ -66,8 +68,8 @@ public class Filter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
@@ -83,9 +85,15 @@ public class Filter extends OncePerRequestFilter {
         }
 
         try {
-            Account account = tokenService.extractAccount(token);
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(account, token, account.getAuthorities());
+            // Extract minimal account (contains email + role) from token, then load full entity from DB
+            Account tokenAccount = tokenService.extractAccount(token);
+            Account account = accountRepository.findAccountByEmail(tokenAccount.getEmail());
+            if (account == null) {
+                resolver.resolveException(request, response, null, new AuthenticationException("User not found"));
+                return;
+            }
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account, token,
+                    account.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
             filterChain.doFilter(request, response);

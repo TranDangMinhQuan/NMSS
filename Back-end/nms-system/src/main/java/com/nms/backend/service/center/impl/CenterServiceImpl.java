@@ -32,11 +32,9 @@ public class CenterServiceImpl implements CenterService {
     public CenterDTO update(Long id, CenterDTO dto) {
         Center center = centerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Center not found"));
-
         center.setName(dto.getName());
         center.setAddress(dto.getAddress());
         center.setPhone(dto.getPhone());
-
         Center updated = centerRepository.save(center);
         return modelMapper.map(updated, CenterDTO.class);
     }
@@ -45,40 +43,22 @@ public class CenterServiceImpl implements CenterService {
     public void delete(Long id) {
         Center center = centerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Center not found"));
-
         center.setDeleted(true); // soft delete
         centerRepository.save(center);
     }
 
     @Override
+    public List<CenterDTO> getAll() {
+        return centerRepository.findAllByDeletedFalse()
+                .stream()
+                .map(center -> modelMapper.map(center, CenterDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public CenterDTO getById(Long id) {
-        Center center = centerRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new IllegalArgumentException("Center not found or deleted"));
+        Center center = centerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Center not found"));
         return modelMapper.map(center, CenterDTO.class);
-    }
-
-
-    @Override
-    public List<CenterDTO> getByName(String name) {
-        return centerRepository.findByNameAndDeletedFalse(name)
-                .stream()
-                .map(center -> modelMapper.map(center, CenterDTO.class))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CenterDTO> getByPhone(String phone) {
-        return centerRepository.findByPhoneAndDeletedFalse(phone)
-                .stream()
-                .map(center -> modelMapper.map(center, CenterDTO.class))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CenterDTO> getByAddress(String address) {
-        return centerRepository.findByAddressAndDeletedFalse(address)
-                .stream()
-                .map(center -> modelMapper.map(center, CenterDTO.class))
-                .collect(Collectors.toList());
     }
 }

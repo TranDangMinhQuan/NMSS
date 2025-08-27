@@ -23,6 +23,11 @@ public class ServiceType {
     @JoinColumn(name = "center_id", nullable = false)
     private Center center;
 
+<<<<<<< HEAD
     @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ServiceDetails> serviceDetails;
+=======
+    @Column(name = "Status")
+    private Boolean status = true; // active or soft delete
+>>>>>>> 4f449822b70708f0561ffdebff76b81cd044a42f
 }
