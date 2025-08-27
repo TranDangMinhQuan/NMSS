@@ -125,16 +125,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             EmailDetailForForgotPassword emailDetailForForgotPassword = new EmailDetailForForgotPassword();
             emailDetailForForgotPassword.setAccount(account);
             emailDetailForForgotPassword.setSubject("Reset Password");
-            emailDetailForForgotPassword.setLink("http://localhost:5432/reset-password?token=" + tokenService.generateToken(account));
+            // Link should point to the frontend app
+            emailDetailForForgotPassword.setLink("http://localhost:5173/reset-password?token=" + tokenService.generateToken(account));
             emailService.sendResetPasswordEmail(emailDetailForForgotPassword);
         }
     }
 
     @Override
     public void resetPassword(String token, String newPassword) {
-        Account account = tokenService.extractAccount(token);
-        if (account == null) {
+        Account tokenAccount = tokenService.extractAccount(token);
+        if (tokenAccount == null) {
             throw new IllegalArgumentException("Invalid or expired token");
+        }
+        // Load the persistent account from DB to avoid insert-on-save
+        Account account = authenticationRepository.findAccountByEmail(tokenAccount.getEmail());
+        if (account == null) {
+            throw new IllegalArgumentException("User not found");
         }
         account.setPassword(passwordEncoder.encode(newPassword));
         authenticationRepository.save(account);

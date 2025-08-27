@@ -26,7 +26,6 @@ public class ServiceType {
     @JoinColumn(name = "center_id")
     private Center center;
 
-    
     @Column(name = "Status")
     private Boolean status = true; // active or soft delete
 }

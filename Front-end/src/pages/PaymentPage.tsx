@@ -179,7 +179,7 @@ const PaymentPage: React.FC = () => {
 								</div>
 							</div>
 
-							{/* Card fields (mock) */}
+							  {/* ...existing code... */}
 							{method === 'card' && (
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<input className="input-field" placeholder="Tên trên thẻ" />

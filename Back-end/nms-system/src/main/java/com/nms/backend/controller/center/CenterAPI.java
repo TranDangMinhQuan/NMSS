@@ -18,7 +18,7 @@ public class CenterAPI {
     private CenterService centerService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("haRole('ADMIN')")
     public CenterDTO create(@RequestBody CenterDTO dto) {
         return centerService.create(dto);
     }
@@ -35,27 +35,16 @@ public class CenterAPI {
         centerService.delete(id);
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MEMBER','STAFF')")
+    public List<CenterDTO> getAll() {
+        return centerService.getAll();
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MEMBER')")
     public CenterDTO getById(@PathVariable Long id) {
         return centerService.getById(id);
     }
-
-    @GetMapping("/search/by-name")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MEMBER')")
-    public List<CenterDTO> getByName(@RequestParam String name) {
-        return centerService.getByName(name);
-    }
-
-    @GetMapping("/search/by-phone")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MEMBER')")
-    public List<CenterDTO> getByPhone(@RequestParam String phone) {
-        return centerService.getByPhone(phone);
-    }
-
-    @GetMapping("/search/by-address")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MEMBER')")
-    public List<CenterDTO> getByAddress(@RequestParam String address) {
-        return centerService.getByAddress(address);
-    }
 }
+

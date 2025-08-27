@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { register as apiRegister } from '../services/api';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    cccd: '',
     email: '',
     phone: '',
     password: '',
@@ -38,10 +39,10 @@ const RegisterPage: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = 'Tên đăng nhập là bắt buộc';
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+    if (!formData.cccd.trim()) {
+      newErrors.cccd = 'CCCD là bắt buộc';
+    } else if (formData.cccd.length < 9) {
+      newErrors.cccd = 'CCCD phải có ít nhất 9 ký tự';
     }
 
     if (!formData.email.trim()) {
@@ -52,7 +53,7 @@ const RegisterPage: React.FC = () => {
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Số điện thoại là bắt buộc';
-    } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ''))) {
+  } else if (!/^\d{10,11}$/.test(formData.phone.replace(/\s/g, ''))) {
       newErrors.phone = 'Số điện thoại không hợp lệ';
     }
 
@@ -84,19 +85,34 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Chuyển đổi dữ liệu cho đúng schema
+      let gender: 'MALE' | 'FEMALE' = 'MALE';
+      if (formData.gender === 'female') gender = 'FEMALE';
+      // Nếu có giá trị khác, mặc định là MALE hoặc sửa lại logic nếu cần
+      const payload = {
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        cccd: formData.cccd,
+        gender,
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : '',
+        phone: formData.phone,
+        address: formData.address,
+      };
+      await apiRegister(payload);
       alert('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.');
-      setLoading(false);
       navigate('/login');
-    }, 2000);
+    } catch (err) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(errorMsg || 'Đăng ký thất bại!');
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -211,21 +227,21 @@ const RegisterPage: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">Thông tin tài khoản</h3>
               
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                  Tên đăng nhập *
+                <label htmlFor="cccd" className="block text-sm font-medium text-gray-700">
+                  CCCD *
                 </label>
                 <input
-                  id="username"
-                  name="username"
+                  id="cccd"
+                  name="cccd"
                   type="text"
                   required
-                  value={formData.username}
+                  value={formData.cccd}
                   onChange={handleChange}
-                  className={`input-field ${errors.username ? 'border-red-500' : ''}`}
-                  placeholder="Tạo tên đăng nhập"
+                  className={`input-field ${errors.cccd ? 'border-red-500' : ''}`}
+                  placeholder="Nhập số CCCD"
                 />
-                {errors.username && (
-                  <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                {errors.cccd && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cccd}</p>
                 )}
               </div>
 

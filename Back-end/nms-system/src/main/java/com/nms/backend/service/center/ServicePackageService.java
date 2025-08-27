@@ -1,5 +1,6 @@
 package com.nms.backend.service.center;
 
+
 import com.nms.backend.dto.center.ServicePackageDTO;
 
 import java.util.List;
@@ -14,12 +15,5 @@ public interface ServicePackageService {
 
     ServicePackageDTO getById(Long id);
 
-    // Lấy danh sách package theo center
-    List<ServicePackageDTO> getByCenter(Long centerId);
-
-    // Lấy danh sách package theo serviceType
-    List<ServicePackageDTO> getByServiceType(Long serviceTypeId);
-
-    // Lọc theo khoảng giá
-    List<ServicePackageDTO> getByPriceRange(Double min, Double max);
+    List<ServicePackageDTO> getAll();
 }
