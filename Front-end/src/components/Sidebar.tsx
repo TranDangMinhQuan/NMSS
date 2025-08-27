@@ -57,17 +57,6 @@ const Sidebar: React.FC = () => {
   ];
 
   // Staff only items (Admin không có)
-  const staffItems = [
-    {
-      name: 'Đặt chỗ',
-      href: '/booking',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
-  ];
 
   // Admin only items
   const adminItems = [
@@ -95,11 +84,11 @@ const Sidebar: React.FC = () => {
   let allItems = [...navItems];
   
   if (user?.role === 'admin') {
-    // Admin: navItems + adminItems (không có staffItems)
+    // Admin: navItems + adminItems
     allItems = [...navItems, ...adminItems];
   } else if (user?.role === 'staff') {
-    // Staff: navItems + staffItems (không có adminItems)
-    allItems = [...navItems, ...staffItems];
+    // Staff: navItems (không có staffItems vì không còn booking)
+    allItems = [...navItems];
   }
   // Member và các role khác chỉ có navItems cơ bản
 
