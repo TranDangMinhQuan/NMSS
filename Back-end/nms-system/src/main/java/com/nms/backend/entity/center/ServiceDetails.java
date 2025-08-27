@@ -34,10 +34,6 @@ public class ServiceDetails {
     @JoinColumn(name = "service_type_id", nullable = false)
     private ServiceType serviceType;
 
-    // Sửa lại: Dùng mappedBy để ServicePackage quản lý mối quan hệ
-    @ManyToMany(mappedBy = "serviceDetails")
-    private Set<ServicePackage> servicePackages;
-
 
     @Column(nullable = false)
     private Boolean status = true;

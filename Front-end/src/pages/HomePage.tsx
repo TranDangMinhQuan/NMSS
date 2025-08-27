@@ -205,7 +205,7 @@ const HomePage: React.FC = () => {
                       to={`/booking?service=${service.id}`}
                       className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-700 text-white font-semibold shadow hover:scale-105 hover:shadow-lg transition-all duration-200 text-base"
                     >
-                      Đặt chỗ ngay
+                      Mua gói thành viên
                     </Link>
                   </div>
                 </div>

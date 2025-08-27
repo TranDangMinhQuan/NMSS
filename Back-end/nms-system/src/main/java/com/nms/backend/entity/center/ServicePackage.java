@@ -41,7 +41,7 @@ public class ServicePackage {
     @ManyToMany
     @JoinTable(
             name = "service_details_packages",
-            joinColumns = @JoinColumn(name = "serivce_package_id"),
+            joinColumns = @JoinColumn(name = "service_package_id"),
             inverseJoinColumns = @JoinColumn(name = "service_details_id")
     )
     private List<ServiceDetails> serviceDetails;

@@ -9,7 +9,7 @@ public interface ServiceDetailService {
     void softDeleteServiceDetail(Long id);
     ServiceDetailDTO getServiceDetailById(Long id);
 
-    List<ServiceDetailDTO> getServiceDetailsByPackage(Long packageId);
+
     List<ServiceDetailDTO> getServiceDetailsByServiceType(Long serviceTypeId);
     List<ServiceDetailDTO> getServiceDetailsByName(String name);
     List<ServiceDetailDTO> getServiceDetailsByDuration(Integer durationMinutes);
