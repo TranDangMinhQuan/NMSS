@@ -34,13 +34,10 @@ public class ServiceDetails {
     @JoinColumn(name = "service_type_id", nullable = false)
     private ServiceType serviceType;
 
-    @ManyToMany
-    @JoinTable(
-            name = "service_details_packages", // Tên của bảng trung gian
-            joinColumns = @JoinColumn(name = "service_detail_id"), // Khóa ngoại trỏ đến ServiceDetails
-            inverseJoinColumns = @JoinColumn(name = "service_package_id") // Khóa ngoại trỏ đến ServicePackage
-    )
-    private Set<ServicePackage> servicePackages; // Sử dụng Set để biểu thị quan hệ nhiều-nhiều
+    // Sửa lại: Dùng mappedBy để ServicePackage quản lý mối quan hệ
+    @ManyToMany(mappedBy = "serviceDetails")
+    private Set<ServicePackage> servicePackages;
+
 
     @Column(nullable = false)
     private Boolean status = true;

@@ -40,11 +40,11 @@ public class ServicePackage {
 
     @ManyToMany
     @JoinTable(
-            name = "package_services",
-            joinColumns = @JoinColumn(name = "package_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
+            name = "service_details_packages",
+            joinColumns = @JoinColumn(name = "serivce_package_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_details_id")
     )
-    private List<ServiceType> services;
+    private List<ServiceDetails> serviceDetails;
 
     @Column(name = "status")
     private Boolean status = true; // soft delete

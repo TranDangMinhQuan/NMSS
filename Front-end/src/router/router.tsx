@@ -17,7 +17,6 @@ import AdminServiceManagement from '../pages/AdminServiceManagement';
 import PaymentPage from '../pages/PaymentPage';
 import MembershipPage from '../pages/MembershipPage';
 import ServicesPage from '../pages/ServicesPage';
-import MyMembershipsPage from '../pages/MyMembershipsPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -45,7 +44,6 @@ const AppRouter: React.FC = () => {
           <Route path="/accounts/member" element={<MemberAccountsPage />} />
           <Route path="/membership" element={<MembershipPage />} />
           <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/my-memberships" element={<MyMembershipsPage />} />
         </Route>
 
         {/* Protected routes - staff */}

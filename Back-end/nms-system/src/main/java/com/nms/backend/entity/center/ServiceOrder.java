@@ -3,12 +3,13 @@ package com.nms.backend.entity.center;
 
 import com.nms.backend.entity.auth.Account;
 import com.nms.backend.entity.membership.Card;
+import com.nms.backend.entity.membership.CardPackage;
 import com.nms.backend.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
+// Trong ServiceOrder.java
 @Data
 @Entity
 @Table(name = "ServiceOrder")
@@ -18,30 +19,19 @@ public class ServiceOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Người dùng (Member)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Account member;
+    @JoinColumn(name = "card_package_id") // Liên kết trực tiếp với CardPackage
+    private CardPackage cardPackage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id")
-    private Card card;
-
-    // Gói dịch vụ
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "package_id")
-    private ServicePackage servicePackage;
-
-    // Loại dịch vụ
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_type_id")
-    private ServiceType serviceType;
+    @JoinColumn(name = "service_details_id") // Thêm liên kết tới dịch vụ cụ thể
+    private ServiceDetails serviceDetails;
 
     // Thời gian bắt đầu và kết thúc
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    // Trạng thái: PENDING, COMPLETED, CANCELLED
+    // Trạng thái: PENDING, APPROVED, CANCELLED
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 }

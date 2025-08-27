@@ -24,15 +24,15 @@ public class ServiceOrderAPI {
     private ServiceOrderService serviceOrderService;
 
     @Autowired
-    private AuthenticationService authenticationService; // để lấy role của user
+    private AuthenticationService authenticationService;
 
     // Tạo order (chỉ member)
     @PostMapping
     @PreAuthorize("hasRole('MEMBER')")
     public ResponseEntity<ServiceOrderResponseDTO> createOrder(@RequestBody ServiceOrderRequestDTO dto, Principal principal) {
-        // Gán memberId là chính user đang login
-        dto.setMemberId(authenticationService.getCurrentUser(principal).getId());
-        return ResponseEntity.ok(serviceOrderService.createServiceOrder(dto));
+        // Lấy accountId từ principal và truyền vào service để xác minh quyền sở hữu thẻ
+        Long currentUserId = authenticationService.getCurrentUser(principal).getId();
+        return ResponseEntity.ok(serviceOrderService.createServiceOrder(dto, currentUserId));
     }
 
     // Lấy danh sách order của member
