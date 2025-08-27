@@ -5,10 +5,11 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-@Builder
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PaymentDTO {
     private Long id;
     private Long serviceOrderId;
@@ -17,4 +18,3 @@ public class PaymentDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-
