@@ -50,7 +50,9 @@ api.interceptors.request.use((config) => {
         config.headers['Authorization'] = `Bearer ${user.token}`;
       }
     }
-  } catch {}
+  } catch {
+    // Ignore errors reading/parsing localStorage token
+  }
   return config;
 });
 

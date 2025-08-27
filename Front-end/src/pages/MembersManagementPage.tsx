@@ -2,20 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getAccountsByRole, type AccountResponse } from '../services/api';
 
 const MembersManagementPage: React.FC = () => {
-  // Helper function to render role badge
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'ADMIN':
-        return <span className="px-2 py-1 rounded bg-red-100 text-red-700 text-xs font-semibold">Admin</span>;
-      case 'STAFF':
-        return <span className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-semibold">Staff</span>;
-      case 'MEMBER':
-        return <span className="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold">Member</span>;
-      default:
-        return <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold">Unknown</span>;
-    }
-  };
   const [members, setMembers] = useState<AccountResponse[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'ACTIVE' | 'INACTIVE' | 'BANNED'>('all');
 
@@ -25,8 +13,8 @@ const MembersManagementPage: React.FC = () => {
       try {
         const data = await getAccountsByRole('MEMBER');
         setMembers(data);
-      } catch (error) {
-        console.error('Failed to fetch members:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMembers();
@@ -57,8 +45,30 @@ const MembersManagementPage: React.FC = () => {
     );
   };
 
+  const getRoleBadge = (role: string) => {
+    const roleConfig = {
+      ADMIN: { color: 'bg-purple-100 text-purple-800', text: 'Admin' },
+      STAFF: { color: 'bg-blue-100 text-blue-800', text: 'Nhân viên' },
+      MEMBER: { color: 'bg-green-100 text-green-800', text: 'Thành viên' },
+    };
+    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.MEMBER;
     return (
-      <div className="space-y-6">
+      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${config.color}`}>
+        {config.text}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -77,11 +87,10 @@ const MembersManagementPage: React.FC = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="searchTerm" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Tìm kiếm
             </label>
             <input
-              id="searchTerm"
               type="text"
               placeholder="Tìm theo tên, email, số điện thoại..."
               value={searchTerm}
@@ -90,13 +99,12 @@ const MembersManagementPage: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="filterStatus" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Trạng thái
             </label>
             <select
-              id="filterStatus"
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'ACTIVE' | 'INACTIVE' | 'BANNED')}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
               className="input-field"
             >
               <option value="all">Tất cả</option>
@@ -123,6 +131,7 @@ const MembersManagementPage: React.FC = () => {
             Danh sách thành viên ({filteredMembers.length})
           </h3>
         </div>
+        
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -194,6 +203,7 @@ const MembersManagementPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
         {filteredMembers.length === 0 && (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
