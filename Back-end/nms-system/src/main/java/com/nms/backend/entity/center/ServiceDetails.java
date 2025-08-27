@@ -3,7 +3,7 @@ package com.nms.backend.entity.center;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set; // Nên dùng Set thay vì List cho các quan hệ ManyToMany
 
 @Entity
 @Table(name = "service_details")
@@ -35,8 +35,12 @@ public class ServiceDetails {
     private ServiceType serviceType;
 
     @ManyToMany
-    @JoinColumn(name="service_package_id",nullable = false)
-    private ServicePackage servicePackages;
+    @JoinTable(
+            name = "service_details_packages", // Tên của bảng trung gian
+            joinColumns = @JoinColumn(name = "service_detail_id"), // Khóa ngoại trỏ đến ServiceDetails
+            inverseJoinColumns = @JoinColumn(name = "service_package_id") // Khóa ngoại trỏ đến ServicePackage
+    )
+    private Set<ServicePackage> servicePackages; // Sử dụng Set để biểu thị quan hệ nhiều-nhiều
 
     @Column(nullable = false)
     private Boolean status = true;

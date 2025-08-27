@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +31,15 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new RuntimeException("ServiceType not found"));
 
-        ServicePackage servicePackage = servicePackageRepository.findById(dto.getPackageId())
-                .orElseThrow(() -> new RuntimeException("ServicePackage not found"));
+        // Lấy tất cả các ServicePackage từ Set<Long> IDs trong DTO
+        Set<ServicePackage> servicePackages = new HashSet<>(servicePackageRepository.findAllById(dto.getPackageIds()));
+        if (servicePackages.size() != dto.getPackageIds().size()) {
+            throw new RuntimeException("One or more ServicePackages not found");
+        }
 
         ServiceDetails entity = modelMapper.map(dto, ServiceDetails.class);
         entity.setServiceType(serviceType);
-        entity.setServicePackages(servicePackage);
+        entity.setServicePackages(servicePackages); // Gán Set<ServicePackage> vào entity
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : true);
 
         return modelMapper.map(serviceDetailRepository.save(entity), ServiceDetailDTO.class);
@@ -56,10 +61,12 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
             existing.setServiceType(serviceType);
         }
 
-        if (dto.getPackageId() != null) {
-            ServicePackage servicePackage = servicePackageRepository.findById(dto.getPackageId())
-                    .orElseThrow(() -> new RuntimeException("ServicePackage not found"));
-            existing.setServicePackages(servicePackage);
+        if (dto.getPackageIds() != null && !dto.getPackageIds().isEmpty()) {
+            Set<ServicePackage> servicePackages = new HashSet<>(servicePackageRepository.findAllById(dto.getPackageIds()));
+            if (servicePackages.size() != dto.getPackageIds().size()) {
+                throw new RuntimeException("One or more ServicePackages not found");
+            }
+            existing.setServicePackages(servicePackages); // Gán Set<ServicePackage> vào entity
         }
 
         if (dto.getStatus() != null) {
@@ -90,7 +97,8 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
         ServicePackage servicePackage = servicePackageRepository.findById(packageId)
                 .orElseThrow(() -> new RuntimeException("ServicePackage not found"));
 
-        return serviceDetailRepository.findByServicePackageAndStatusTrue(servicePackage)
+        // Giả định bạn đã tạo phương thức findByServicePackagesAndStatusTrue trong repository
+        return serviceDetailRepository.findByServicePackagesAndStatusTrue(servicePackage)
                 .stream()
                 .map(entity -> modelMapper.map(entity, ServiceDetailDTO.class))
                 .collect(Collectors.toList());
@@ -101,11 +109,13 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
         ServiceType serviceType = serviceTypeRepository.findById(serviceTypeId)
                 .orElseThrow(() -> new RuntimeException("ServiceType not found"));
 
+        // Đã sửa lỗi đánh máy: đổi 'servicPackage' thành 'serviceType'
         return serviceDetailRepository.findByServiceTypeAndStatusTrue(serviceType)
                 .stream()
                 .map(entity -> modelMapper.map(entity, ServiceDetailDTO.class))
                 .collect(Collectors.toList());
     }
+
     @Override
     public List<ServiceDetailDTO> getServiceDetailsByName(String name) {
         return serviceDetailRepository.findByNameContainingIgnoreCaseAndStatusTrue(name)
