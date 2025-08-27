@@ -32,7 +32,7 @@ const DashboardPage: React.FC = () => {
         });
         
         setStats(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('[ERROR] Failed to fetch dashboard stats:', err);
         setError('Không thể tải dữ liệu dashboard');
       } finally {

@@ -13,7 +13,17 @@ const AdminPackageManagement: React.FC = () => {
       try {
         setError(null);
         const data = await getAllPackages();
+<<<<<<< HEAD
         console.log('[AdminPackageManagement] packages payload sample:', Array.isArray(data) ? data[0] : data);
+=======
+        // Debug: Inspect BE payload shape
+        try {
+          // eslint-disable-next-line no-console
+          console.log('[AdminPackageManagement] packages payload sample:', Array.isArray(data) ? data[0] : data);
+        } catch {
+          // intentionally ignored
+        }
+>>>>>>> 6246b1f644d4aac29ff0901dc8f5c4419c1cb803
         setPackages(data);
       } catch (error) {
         console.error('Failed to fetch packages:', error);
@@ -124,9 +134,30 @@ const AdminPackageManagement: React.FC = () => {
     return undefined;
   };
 
+<<<<<<< HEAD
   const getAllowedDays = (pkg: any): string[] => pkg?.allowedDays ?? [];
   const getStatus = (pkg: any): boolean => {
     const val = pkg?.status ?? pkg?.is_active ?? pkg?.active;
+=======
+  const parseNumber = (val: unknown): number | undefined => {
+    if (typeof val === 'number') return Number.isFinite(val) ? val : undefined;
+    if (typeof val === 'string') {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : undefined;
+    }
+    return undefined;
+  };
+
+  const getDayConstraints = (pkg: ServicePackageDTO): string => pkg?.dayConstraints ?? (pkg as ServicePackageDTO & { day_constraints?: string })?.day_constraints ?? '';
+  const getMaxUsesPerDay = (pkg: ServicePackageDTO): number | undefined => {
+    const val = (pkg as ServicePackageDTO & { max_uses_per_day?: unknown })?.maxUsesPerDay ?? (pkg as Partial<ServicePackageDTO> & { max_uses_per_day?: unknown })?.max_uses_per_day;
+    return parseNumber(val);
+  };
+  const getStatus = (pkg: ServicePackageDTO): boolean => {
+    const val = (pkg as ServicePackageDTO & { is_active?: unknown; active?: unknown }).status 
+      ?? (pkg as Partial<ServicePackageDTO> & { is_active?: unknown }).is_active 
+      ?? (pkg as Partial<ServicePackageDTO> & { active?: unknown }).active;
+>>>>>>> 6246b1f644d4aac29ff0901dc8f5c4419c1cb803
     const parsed = parseBoolean(val);
     return parsed ?? true;
   };

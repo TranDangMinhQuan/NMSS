@@ -104,7 +104,7 @@ const MembersManagementPage: React.FC = () => {
             </label>
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'ACTIVE' | 'INACTIVE' | 'BANNED')}
               className="input-field"
             >
               <option value="all">Tất cả</option>

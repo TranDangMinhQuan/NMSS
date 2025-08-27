@@ -15,7 +15,7 @@ const ServicesPage: React.FC = () => {
       id: 'gym',
       name: 'Phòng Gym',
       category: 'gym',
-      description: 'Phòng gym hiện đại, trang bị đầy đủ thiết bị, không gian thoải mái, mở cửa từ 5AM - 11PM, đặt phòng tối thiểu 1 giờ.',
+      description: 'Phòng gym hiện đại, trang bị đầy đủ thiết bị, không gian thoải mái, mở cửa từ 5AM - 11PM.',
       price: 200000,
       unit: 'tháng',
       image: 'https://www.nhavanhoasinhvien.vn/wp-content/uploads/2024/12/z6102634179598_0efe25717f0d11fb8140cf59f07e467a-scaled.jpg',
