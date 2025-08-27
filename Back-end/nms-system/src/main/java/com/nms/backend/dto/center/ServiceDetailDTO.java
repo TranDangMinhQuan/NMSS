@@ -12,6 +12,5 @@ public class ServiceDetailDTO {
     private Double basePrice;
     private Integer durationMinutes;
     private Long serviceTypeId;
-    private Set<Long> packageIds; // Đổi tên biến để phản ánh đúng Set<Long>
     private Boolean status;
 }

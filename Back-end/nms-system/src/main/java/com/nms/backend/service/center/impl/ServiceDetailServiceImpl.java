@@ -31,19 +31,13 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new RuntimeException("ServiceType not found"));
 
-        // Lấy tất cả các ServicePackage từ Set<Long> IDs trong DTO
-        Set<ServicePackage> servicePackages = new HashSet<>(servicePackageRepository.findAllById(dto.getPackageIds()));
-        if (servicePackages.size() != dto.getPackageIds().size()) {
-            throw new RuntimeException("One or more ServicePackages not found");
-        }
-
         ServiceDetails entity = modelMapper.map(dto, ServiceDetails.class);
         entity.setServiceType(serviceType);
-        entity.setServicePackages(servicePackages); // Gán Set<ServicePackage> vào entity
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : true);
 
         return modelMapper.map(serviceDetailRepository.save(entity), ServiceDetailDTO.class);
     }
+
 
     @Override
     public ServiceDetailDTO updateServiceDetail(Long id, ServiceDetailDTO dto) {
@@ -61,13 +55,6 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
             existing.setServiceType(serviceType);
         }
 
-        if (dto.getPackageIds() != null && !dto.getPackageIds().isEmpty()) {
-            Set<ServicePackage> servicePackages = new HashSet<>(servicePackageRepository.findAllById(dto.getPackageIds()));
-            if (servicePackages.size() != dto.getPackageIds().size()) {
-                throw new RuntimeException("One or more ServicePackages not found");
-            }
-            existing.setServicePackages(servicePackages); // Gán Set<ServicePackage> vào entity
-        }
 
         if (dto.getStatus() != null) {
             existing.setStatus(dto.getStatus());
@@ -92,24 +79,14 @@ public class ServiceDetailServiceImpl implements ServiceDetailService {
                 .orElseThrow(() -> new RuntimeException("ServiceDetail not found"));
     }
 
-    @Override
-    public List<ServiceDetailDTO> getServiceDetailsByPackage(Long packageId) {
-        ServicePackage servicePackage = servicePackageRepository.findById(packageId)
-                .orElseThrow(() -> new RuntimeException("ServicePackage not found"));
 
-        // Giả định bạn đã tạo phương thức findByServicePackagesAndStatusTrue trong repository
-        return serviceDetailRepository.findByServicePackagesAndStatusTrue(servicePackage)
-                .stream()
-                .map(entity -> modelMapper.map(entity, ServiceDetailDTO.class))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public List<ServiceDetailDTO> getServiceDetailsByServiceType(Long serviceTypeId) {
         ServiceType serviceType = serviceTypeRepository.findById(serviceTypeId)
                 .orElseThrow(() -> new RuntimeException("ServiceType not found"));
 
-        // Đã sửa lỗi đánh máy: đổi 'servicPackage' thành 'serviceType'
+
         return serviceDetailRepository.findByServiceTypeAndStatusTrue(serviceType)
                 .stream()
                 .map(entity -> modelMapper.map(entity, ServiceDetailDTO.class))

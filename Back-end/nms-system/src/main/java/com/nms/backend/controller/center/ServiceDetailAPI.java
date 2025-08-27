@@ -40,11 +40,6 @@ public class ServiceDetailAPI {
         return serviceDetailService.getServiceDetailById(id);
     }
 
-    @GetMapping("/package/{packageId}")
-    @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER','GUEST')")
-    public List<ServiceDetailDTO> getByPackage(@PathVariable Long packageId) {
-        return serviceDetailService.getServiceDetailsByPackage(packageId);
-    }
 
     @GetMapping("/service-type/{serviceTypeId}")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER','GUEST')")

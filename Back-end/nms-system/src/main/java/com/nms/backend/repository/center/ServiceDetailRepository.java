@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface ServiceDetailRepository extends JpaRepository<ServiceDetails, Long> {
     List<ServiceDetails> findByStatusTrue();
-    List<ServiceDetails> findByServicePackagesAndStatusTrue(ServicePackage servicePackage);
     List<ServiceDetails> findByServiceTypeAndStatusTrue(ServiceType serviceType);
     List<ServiceDetails> findByNameContainingIgnoreCaseAndStatusTrue(String name);
     List<ServiceDetails> findByDurationMinutesAndStatusTrue(Integer durationMinutes);
