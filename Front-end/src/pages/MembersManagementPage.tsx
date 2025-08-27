@@ -2,8 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { getAccountsByRole, type AccountResponse } from '../services/api';
 
 const MembersManagementPage: React.FC = () => {
+  // Helper function to render role badge
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return <span className="px-2 py-1 rounded bg-red-100 text-red-700 text-xs font-semibold">Admin</span>;
+      case 'STAFF':
+        return <span className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-semibold">Staff</span>;
+      case 'MEMBER':
+        return <span className="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold">Member</span>;
+      default:
+        return <span className="px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold">Unknown</span>;
+    }
+  };
   const [members, setMembers] = useState<AccountResponse[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'ACTIVE' | 'INACTIVE' | 'BANNED'>('all');
 
@@ -13,8 +25,8 @@ const MembersManagementPage: React.FC = () => {
       try {
         const data = await getAccountsByRole('MEMBER');
         setMembers(data);
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch members:', error);
       }
     };
     fetchMembers();
