@@ -287,4 +287,40 @@ export interface ServiceOrderResponseDTO {
   status: string;
 }
 
+// Membership DTO for MyMembershipsPage
+export type MembershipDTO = {
+  id: string;
+  planName: string;
+  duration: string;
+  activatedAt: string;
+  expiredAt: string;
+  description?: string;
+  status: 'ACTIVE' | 'EXPIRED';
+};
+
+// Dummy/mock API for demo, replace with real API call
+export async function getMyMemberships(): Promise<MembershipDTO[]> {
+  // Replace with: const response = await api.get('/api/memberships/my'); return response.data;
+  return [
+    {
+      id: '1',
+      planName: 'Gói Premium',
+      duration: '6 tháng',
+      activatedAt: '2025-01-01',
+      expiredAt: '2025-07-01',
+      description: 'Tất cả quyền lợi gói Premium, tích điểm gấp đôi, miễn phí khóa học định kỳ.',
+      status: 'ACTIVE',
+    },
+    {
+      id: '2',
+      planName: 'Gói Cơ Bản',
+      duration: '3 tháng',
+      activatedAt: '2024-09-01',
+      expiredAt: '2024-12-01',
+      description: 'Sử dụng tất cả dịch vụ cơ bản, tích điểm cơ bản.',
+      status: 'EXPIRED',
+    },
+  ];
+}
+
 export default api;

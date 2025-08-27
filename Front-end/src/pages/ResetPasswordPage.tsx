@@ -26,11 +26,30 @@ const ResetPasswordPage: React.FC = () => {
     setLoading(true);
     setError(null);
     setMessage(null);
+    // Define a type for the error object
+    type ApiError = {
+      response?: {
+        data?: {
+          message?: string;
+        };
+      };
+      message?: string;
+    };
+
     try {
       await resetPassword(token, password);
       setMessage('Đặt lại mật khẩu thành công. Bạn có thể đăng nhập với mật khẩu mới.');
     } catch (e) {
-      setError('Không thể đặt lại mật khẩu. Token có thể đã hết hạn.');
+      let errorMessage = 'Không thể đặt lại mật khẩu. Token có thể đã hết hạn.';
+      if (typeof e === 'object' && e !== null) {
+        const err = e as ApiError;
+        if ('response' in err && typeof err.response?.data?.message === 'string') {
+          errorMessage = err.response!.data!.message!;
+        } else if ('message' in err && typeof err.message === 'string') {
+          errorMessage = err.message!;
+        }
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

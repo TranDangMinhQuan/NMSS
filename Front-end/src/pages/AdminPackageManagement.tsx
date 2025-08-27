@@ -16,7 +16,9 @@ const AdminPackageManagement: React.FC = () => {
         try {
           // eslint-disable-next-line no-console
           console.log('[AdminPackageManagement] packages payload sample:', Array.isArray(data) ? data[0] : data);
-        } catch {}
+        } catch {
+          // intentionally ignored
+        }
         setPackages(data);
       } catch (error) {
         console.error('Failed to fetch packages:', error);
@@ -94,13 +96,15 @@ const AdminPackageManagement: React.FC = () => {
     return undefined;
   };
 
-  const getDayConstraints = (pkg: ServicePackageDTO): string => pkg?.dayConstraints ?? (pkg as any)?.day_constraints ?? '';
+  const getDayConstraints = (pkg: ServicePackageDTO): string => pkg?.dayConstraints ?? (pkg as ServicePackageDTO & { day_constraints?: string })?.day_constraints ?? '';
   const getMaxUsesPerDay = (pkg: ServicePackageDTO): number | undefined => {
-    const val = (pkg as ServicePackageDTO & { max_uses_per_day?: unknown })?.maxUsesPerDay ?? (pkg as any)?.max_uses_per_day;
+    const val = (pkg as ServicePackageDTO & { max_uses_per_day?: unknown })?.maxUsesPerDay ?? (pkg as Partial<ServicePackageDTO> & { max_uses_per_day?: unknown })?.max_uses_per_day;
     return parseNumber(val);
   };
   const getStatus = (pkg: ServicePackageDTO): boolean => {
-    const val = (pkg as ServicePackageDTO & { is_active?: unknown; active?: unknown }).status ?? (pkg as any).is_active ?? (pkg as any).active;
+    const val = (pkg as ServicePackageDTO & { is_active?: unknown; active?: unknown }).status 
+      ?? (pkg as Partial<ServicePackageDTO> & { is_active?: unknown }).is_active 
+      ?? (pkg as Partial<ServicePackageDTO> & { active?: unknown }).active;
     const parsed = parseBoolean(val);
     // BE list endpoint returns only active packages; when field absent, assume active
     return parsed ?? true;
