@@ -5,29 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8545904-2eb3-4971-a2f8-5a516d812f48" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/.mvn/wrapper/MavenWrapperDownloader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/.mvn/wrapper/maven-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/mvnw.cmd" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/mvnw.cmd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/DataInitializr.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/DataInitializr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/Filter.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/Filter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/controller/center/CenterAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/controller/center/CenterAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/controller/center/ServicePackageAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/controller/center/ServicePackageAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/entity/center/ServiceType.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/entity/center/ServiceType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/auth/AccountRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/auth/AccountRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/center/CenterRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/center/CenterRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/center/ServicePackageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/repository/center/ServicePackageRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/auth/impl/AuthenticationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/auth/impl/AuthenticationServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/CenterService.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/CenterService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/ServicePackageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/ServicePackageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/impl/CenterServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/impl/CenterServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/impl/ServicePackageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/nms-system/src/main/java/com/nms/backend/service/center/impl/ServicePackageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +27,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.NmsApplication.executor": "Run",
@@ -94,7 +76,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756272634868</updated>
-      <workItem from="1756272636409" duration="335000" />
+      <workItem from="1756272636409" duration="1507000" />
     </task>
     <servers />
   </component>

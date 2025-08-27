@@ -1,29 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import type { DashboardStats } from '../types';
+import type { DashboardStatsDTO } from '../services/api';
+import { getDashboardStats } from '../services/api';
 
 const DashboardPage: React.FC = () => {
-  const [stats, setStats] = useState<DashboardStats>({
+  const [stats, setStats] = useState<DashboardStatsDTO>({
     totalMembers: 0,
     activeMemberships: 0,
-    totalRevenue: 0,
     pendingBookings: 0,
-    todayCheckins: 0,
+    completedBookings: 0,
+    activePackages: 0,
   });
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setStats({
-        totalMembers: 1250,
-        activeMemberships: 890,
-        totalRevenue: 125000000,
-        pendingBookings: 45,
-        todayCheckins: 156,
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchDashboardStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('[DEBUG] Starting to fetch dashboard stats...');
+        
+        const data = await getDashboardStats();
+        console.log('[DEBUG] Dashboard stats received:', data);
+        console.log('[DEBUG] Stats breakdown:', {
+          totalMembers: data.totalMembers,
+          activeMemberships: data.activeMemberships,
+          pendingBookings: data.pendingBookings,
+          completedBookings: data.completedBookings,
+          activePackages: data.activePackages,
+        });
+        
+        setStats(data);
+      } catch (err: any) {
+        console.error('[ERROR] Failed to fetch dashboard stats:', err);
+        setError('Không thể tải dữ liệu dashboard');
+      } finally {
+        setLoading(false);
+        console.log('[DEBUG] Loading finished');
+      }
+    };
+
+    fetchDashboardStats();
   }, []);
 
   const StatCard: React.FC<{
@@ -116,7 +134,28 @@ const DashboardPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải dữ liệu dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <p className="text-red-600 text-lg mb-2">Có lỗi xảy ra</p>
+          <p className="text-gray-600">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            Thử lại
+          </button>
+        </div>
       </div>
     );
   }
@@ -152,16 +191,6 @@ const DashboardPage: React.FC = () => {
           color="bg-green-500"
         />
         <StatCard
-          title="Doanh thu tháng"
-          value={`${(stats.totalRevenue / 1000000).toFixed(1)}M VNĐ`}
-          icon={
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-          }
-          color="bg-yellow-500"
-        />
-        <StatCard
           title="Đặt chỗ chờ xử lý"
           value={stats.pendingBookings}
           icon={
@@ -170,6 +199,26 @@ const DashboardPage: React.FC = () => {
             </svg>
           }
           color="bg-red-500"
+        />
+        <StatCard
+          title="Đặt chỗ đã hoàn thành"
+          value={stats.completedBookings}
+          icon={
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
+          color="bg-green-500"
+        />
+        <StatCard
+          title="Gói dịch vụ đang hoạt động"
+          value={stats.activePackages}
+          icon={
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          }
+          color="bg-purple-500"
         />
       </div>
 

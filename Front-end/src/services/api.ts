@@ -126,4 +126,131 @@ export async function getAccountsByRole(role: RoleEnum) {
     return response.data;
 }
 
+export interface DashboardStatsDTO {
+  totalMembers: number;
+  activeMemberships: number;
+  pendingBookings: number;
+  completedBookings: number;
+  activePackages: number;
+}
+
+// Account API
+export const getAllAccounts = async (): Promise<AccountResponse[]> => {
+  try {
+    // Backend has /api/account/list-account/{role} endpoints
+    // We'll get all roles: ADMIN, STAFF, MEMBER
+    const [adminAccounts, staffAccounts, memberAccounts] = await Promise.all([
+      api.get('/api/account/list-account/ADMIN'),
+      api.get('/api/account/list-account/STAFF'),
+      api.get('/api/account/list-account/MEMBER'),
+    ]);
+    
+    // Combine all accounts
+    const allAccounts = [
+      ...adminAccounts.data,
+      ...staffAccounts.data,
+      ...memberAccounts.data,
+    ];
+    
+    console.log('[DEBUG] 📊 All accounts by role:', {
+      admin: adminAccounts.data.length,
+      staff: staffAccounts.data.length,
+      member: memberAccounts.data.length,
+      total: allAccounts.length
+    });
+    
+    return allAccounts;
+  } catch (error) {
+    console.error('Failed to fetch accounts:', error);
+    return [];
+  }
+};
+
+// Service Order API
+export const getAllOrders = async (): Promise<ServiceOrderResponseDTO[]> => {
+  try {
+    const response = await api.get('/api/service-orders');
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch orders:', error);
+    return [];
+  }
+};
+
+// Dashboard API
+export const getDashboardStats = async (): Promise<DashboardStatsDTO> => {
+  try {
+    console.log('[DEBUG] 🚀 Starting dashboard stats calculation...');
+    
+    // Get data from existing backend APIs
+    console.log('[DEBUG] 📡 Calling getAllAccounts()...');
+    const accounts = await getAllAccounts();
+    console.log('[DEBUG] 📊 Accounts received:', accounts);
+    console.log('[DEBUG] 📊 Accounts count:', accounts.length);
+    
+    console.log('[DEBUG] 📡 Calling getAllPackages()...');
+    const packages = await getAllPackages();
+    console.log('[DEBUG] 📦 Packages received:', packages);
+    console.log('[DEBUG] 📦 Packages count:', packages.length);
+    
+    console.log('[DEBUG] 📡 Calling getAllOrders()...');
+    const orders = await getAllOrders();
+    console.log('[DEBUG] 📋 Orders received:', orders);
+    console.log('[DEBUG] 📋 Orders count:', orders.length);
+    
+    console.log('[DEBUG] 🔍 Raw data summary:', { 
+      accountsCount: accounts.length, 
+      packagesCount: packages.length, 
+      ordersCount: orders.length 
+    });
+    
+    // Calculate real statistics
+    const totalMembers = accounts.filter((acc: AccountResponse) => acc.role === 'MEMBER').length;
+    const activeMemberships = accounts.filter((acc: AccountResponse) => acc.role === 'MEMBER' && acc.status === 'ACTIVE').length;
+    const pendingBookings = orders.filter((order: ServiceOrderResponseDTO) => order.status === 'PENDING').length;
+    const completedBookings = orders.filter((order: ServiceOrderResponseDTO) => order.status === 'COMPLETED').length;
+    const activePackages = packages.filter((pkg: ServicePackageDTO) => pkg.status === true).length;
+    
+    const stats = {
+      totalMembers,
+      activeMemberships,
+      pendingBookings,
+      completedBookings,
+      activePackages,
+    };
+    
+    console.log('[DEBUG] 🧮 Calculated stats:', stats);
+    console.log('[DEBUG] 🧮 Calculation details:', {
+      totalMembers: `${totalMembers} (filtered from ${accounts.length} accounts)`,
+      activeMemberships: `${activeMemberships} (filtered from ${accounts.length} accounts)`,
+      pendingBookings: `${pendingBookings} (filtered from ${orders.length} orders)`,
+      completedBookings: `${completedBookings} (filtered from ${orders.length} orders)`,
+      activePackages: `${activePackages} (filtered from ${packages.length} packages)`,
+    });
+    
+    return stats;
+    
+  } catch (error) {
+    console.error('[ERROR] ❌ Failed to fetch dashboard stats:', error);
+    // Return default values if API fails
+    return {
+      totalMembers: 0,
+      activeMemberships: 0,
+      pendingBookings: 0,
+      completedBookings: 0,
+      activePackages: 0,
+    };
+  }
+};
+
+export interface ServiceOrderResponseDTO {
+  id: number;
+  memberId: number;
+  packageId: number;
+  serviceTypeId: number;
+  startTime: string;
+  endTime: string;
+  status: string;
+}
+
 export default api;
