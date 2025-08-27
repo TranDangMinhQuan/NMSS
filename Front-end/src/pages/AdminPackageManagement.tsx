@@ -85,29 +85,10 @@ const AdminPackageManagement: React.FC = () => {
     return undefined;
   };
 
-<<<<<<< HEAD
 
   const getDayConstraints = (pkg: any): string => pkg?.dayConstraints ?? pkg?.day_constraints ?? '';
   const getStatus = (pkg: any): boolean => {
     const val = pkg?.status ?? pkg?.is_active ?? pkg?.active;
-=======
-  const parseNumber = (val: unknown): number | undefined => {
-    if (typeof val === 'number') return Number.isFinite(val) ? val : undefined;
-    if (typeof val === 'string') {
-      const n = Number(val);
-      return Number.isFinite(n) ? n : undefined;
-    }
-    return undefined;
-  };
-
-  const getDayConstraints = (pkg: ServicePackageDTO): string => pkg?.dayConstraints ?? (pkg as any)?.day_constraints ?? '';
-  const getMaxUsesPerDay = (pkg: ServicePackageDTO): number | undefined => {
-    const val = (pkg as ServicePackageDTO & { max_uses_per_day?: unknown })?.maxUsesPerDay ?? (pkg as any)?.max_uses_per_day;
-    return parseNumber(val);
-  };
-  const getStatus = (pkg: ServicePackageDTO): boolean => {
-    const val = (pkg as ServicePackageDTO & { is_active?: unknown; active?: unknown }).status ?? (pkg as any).is_active ?? (pkg as any).active;
->>>>>>> b60b9a8f3607b7836ce73051b5e376640d9ab455
     const parsed = parseBoolean(val);
     // BE list endpoint returns only active packages; when field absent, assume active
     return parsed ?? true;

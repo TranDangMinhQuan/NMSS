@@ -69,16 +69,8 @@ const Sidebar: React.FC = () => {
   // Đã xóa adminItems vì không còn mục riêng cho admin ngoài dropdown Thành viên
 
   // Logic để hiển thị menu theo role
-  let allItems = [...navItems];
-  
-  if (user?.role === 'admin') {
-    // Admin: navItems + adminItems
-    allItems = [...navItems, ...adminItems];
-  } else if (user?.role === 'staff') {
-    // Staff: navItems (không có staffItems vì không còn booking)
-    allItems = [...navItems];
-  }
-  // Member và các role khác chỉ có navItems cơ bản
+  // Không cần allItems nữa, render trực tiếp navItems, staffItems, 
+  // và dropdown Thành viên cho admin
 
   return (
     <aside className="w-64 bg-white shadow-lg border-r border-gray-200 min-h-screen flex flex-col">
