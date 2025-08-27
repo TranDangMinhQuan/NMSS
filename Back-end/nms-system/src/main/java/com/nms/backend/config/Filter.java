@@ -40,14 +40,15 @@ public class Filter extends OncePerRequestFilter {
     private final List<String> PUBLIC_API = List.of(
             "POST:/api/register",
             "POST:/api/login",
+            // Forgot/reset password (public)
+            "POST:/api/forgot-password-request",
+            "POST:/api/reset-password-request",
             "GET:/swagger-ui/**",
             "GET:/v3/api-docs",
             "GET:/v3/api-docs/**",
             "GET:/swagger-resources/**",
             "GET:/webjars/**",
             "GET:/swagger-ui.html",
-            "POST:/api/auth/forgot-password",
-            "POST:/api/auth/reset-password",
             "GET:/ws/**");
 
     private boolean isPublicAPI(String uri, String method) {
@@ -81,7 +82,13 @@ public class Filter extends OncePerRequestFilter {
         }
 
         try {
-            Account account = tokenService.extractAccount(token);
+            // Extract minimal account (contains email + role) from token, then load full entity from DB
+            Account tokenAccount = tokenService.extractAccount(token);
+            Account account = accountRepository.findAccountByEmail(tokenAccount.getEmail());
+            if (account == null) {
+                resolver.resolveException(request, response, null, new AuthenticationException("User not found"));
+                return;
+            }
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(account, token,
                     account.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

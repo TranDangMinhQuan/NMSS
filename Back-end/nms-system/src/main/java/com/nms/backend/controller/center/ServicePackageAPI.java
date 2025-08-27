@@ -12,50 +12,43 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/packages")
 @SecurityRequirement(name = "api")
-public class ServicePackageAPI {
+public class ServicePackageAPI{
 
     @Autowired
     private ServicePackageService packageService;
 
+    // Tạo gói dịch vụ (ADMIN/STAFF)
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @PostMapping
     public ServicePackageDTO createPackage(@RequestBody ServicePackageDTO dto) {
         return packageService.create(dto);
     }
 
+    // Cập nhật gói dịch vụ (ADMIN/STAFF)
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @PutMapping("/{id}")
     public ServicePackageDTO updatePackage(@PathVariable Long id, @RequestBody ServicePackageDTO dto) {
         return packageService.update(id, dto);
     }
 
+    // Xóa gói dịch vụ (soft delete) (ADMIN/STAFF)
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @DeleteMapping("/{id}")
     public void deletePackage(@PathVariable Long id) {
         packageService.delete(id);
     }
 
+    // Lấy thông tin gói dịch vụ theo ID (Admin/Staff/Member)
     @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER')")
     @GetMapping("/{id}")
     public ServicePackageDTO getPackageById(@PathVariable Long id) {
         return packageService.getById(id);
     }
 
+    // Lấy danh sách tất cả gói dịch vụ (Admin/Staff/Member)
     @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER')")
-    @GetMapping("/center/{centerId}")
-    public List<ServicePackageDTO> getByCenter(@PathVariable Long centerId) {
-        return packageService.getByCenter(centerId);
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER')")
-    @GetMapping("/service-type/{serviceTypeId}")
-    public List<ServicePackageDTO> getByServiceType(@PathVariable Long serviceTypeId) {
-        return packageService.getByServiceType(serviceTypeId);
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN','STAFF','MEMBER')")
-    @GetMapping("/price-range")
-    public List<ServicePackageDTO> getByPriceRange(@RequestParam Double min, @RequestParam Double max) {
-        return packageService.getByPriceRange(min, max);
+    @GetMapping
+    public List<ServicePackageDTO> getAllPackages() {
+        return packageService.getAll();
     }
 }
