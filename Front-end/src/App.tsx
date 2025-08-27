@@ -106,9 +106,9 @@ const App: React.FC = () => {
             </MainLayout>
           } />
           
-          {/* Admin Services Management */}
+          {/* Quản lý dịch vụ: Cho phép admin, staff, member */}
           <Route path="/services" element={
-            <ProtectedRoute roles={['admin']}>
+            <ProtectedRoute roles={['admin', 'staff', 'member']}>
               <MainLayout>
                 <React.Suspense fallback={<div>Loading...</div>}>
                   <AdminServiceManagement />
@@ -116,10 +116,10 @@ const App: React.FC = () => {
               </MainLayout>
             </ProtectedRoute>
           } />
-          
-          {/* Admin Packages Management */}
+
+          {/* Quản lý gói dịch vụ: Cho phép admin, staff, member */}
           <Route path="/packages" element={
-            <ProtectedRoute roles={['admin']}>
+            <ProtectedRoute roles={['admin', 'staff', 'member']}>
               <MainLayout>
                 <React.Suspense fallback={<div>Loading...</div>}>
                   <AdminPackageManagement />
@@ -127,10 +127,10 @@ const App: React.FC = () => {
               </MainLayout>
             </ProtectedRoute>
           } />
-          
-          {/* Member Services View */}
+
+          {/* Xem dịch vụ: Cho phép member, staff, admin */}
           <Route path="/member-services" element={
-            <ProtectedRoute roles={['member']}>
+            <ProtectedRoute roles={['member', 'staff', 'admin']}>
               <MainLayout>
                 <React.Suspense fallback={<div>Loading...</div>}>
                   <ServicesPage />

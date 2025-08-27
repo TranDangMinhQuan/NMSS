@@ -4,6 +4,12 @@ import { useAuth } from '../hooks/useAuth';
 import Logo from '../assets/logo.svg';
 
 const Header: React.FC = () => {
+  // Helper for avatar initial
+  const getAvatarInitial = () => {
+    if (user?.username && user.username.length > 0) return user.username.charAt(0).toUpperCase();
+    if (user?.fullName && user.fullName.length > 0) return user.fullName.charAt(0).toUpperCase();
+    return 'U';
+  };
   useEffect(() => {
     const header = document.getElementById('main-header');
     if (header) {
@@ -141,7 +147,7 @@ const Header: React.FC = () => {
                   </div>
                   <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                     <span className="text-primary-600 font-medium text-sm">
-                      {(user.username?.charAt(0) ?? user.fullName?.charAt(0) ?? 'U').toUpperCase()}
+                      {getAvatarInitial()}
                     </span>
                   </div>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
