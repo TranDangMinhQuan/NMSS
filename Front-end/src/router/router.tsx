@@ -1,13 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-<<<<<<< HEAD
 import AdminAccountsPage from '../pages/AdminAccountsPage';
 import StaffAccountsPage from '../pages/StaffAccountsPage';
 import MemberAccountsPage from '../pages/MemberAccountsPage';
-=======
 import ProtectedRoute from '../components/ProtectedRoute';
->>>>>>> b60b9a8f3607b7836ce73051b5e376640d9ab455
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
@@ -42,11 +39,9 @@ const AppRouter: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={["member"]}><MainLayout /></ProtectedRoute>}>
           <Route path="/member-services" element={<ServicesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-<<<<<<< HEAD
           <Route path="/accounts/admin" element={<AdminAccountsPage />} />
           <Route path="/accounts/staff" element={<StaffAccountsPage />} />
           <Route path="/accounts/member" element={<MemberAccountsPage />} />
-=======
           <Route path="/membership" element={<MembershipPage />} />
           <Route path="/payment" element={<PaymentPage />} />
         </Route>
@@ -61,7 +56,6 @@ const AppRouter: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={["admin"]}><MainLayout /></ProtectedRoute>}>
           <Route path="/admin/packages" element={<AdminPackageManagement />} />
           <Route path="/admin/services" element={<AdminServiceManagement />} />
->>>>>>> b60b9a8f3607b7836ce73051b5e376640d9ab455
         </Route>
       </Routes>
     </Router>

@@ -16,6 +16,17 @@ api.interceptors.request.use((config) => {
       if (user?.token) {
         config.headers = config.headers || {};
         config.headers['Authorization'] = `Bearer ${user.token}`;
+        
+        // Debug: Log authentication details for package/service requests
+        if (config.url?.includes('service-packages') || config.url?.includes('service-types')) {
+          console.log('🔐 Auth Debug:', {
+            url: config.url,
+            method: config.method?.toUpperCase(),
+            userRole: user.role,
+            hasToken: !!user.token,
+            authHeader: config.headers['Authorization'] ? 'Present' : 'Missing'
+          });
+        }
       }
     }
   } catch {
@@ -74,12 +85,23 @@ export async function getMemberProfile() {
 
 // ================= Admin Data Fetching (aligned with BE DTOs) =================
 
+export interface CenterDTO {
+    id: number;
+    name: string;
+    address: string;
+    phone: string;
+}
+
 export interface ServiceTypeDTO {
     id: number;
     name: string;
-    description: string;
     centerId: number;
-    status: boolean;
+    // Note: Backend doesn't have description or status fields
+}
+
+export async function getAllCenters() {
+    const response = await api.get<CenterDTO[]>(`/api/centers`);
+    return response.data;
 }
 
 export async function getServiceTypesByCenter(centerId: number) {
@@ -107,7 +129,7 @@ export interface ServicePackageDTO {
     minPrice: number;
     maxPrice: number;
     totalSessions: number;
-    dayConstraints: string;
+    allowedDays: string[]; // Backend uses allowedDays as List<String> (MONDAY, TUESDAY, etc.)
     maxDurationMinutes: number;
     maxUsesPerDay?: number;
     status?: boolean;
@@ -115,22 +137,53 @@ export interface ServicePackageDTO {
 }
 
 export async function getAllPackages() {
-    const response = await api.get<ServicePackageDTO[]>(`/api/packages`);
+    const response = await api.get<ServicePackageDTO[]>(`/api/service-packages/active`);
     return response.data;
 }
 
 export async function createPackage(payload: Partial<ServicePackageDTO>) {
-    const response = await api.post<ServicePackageDTO>(`/api/packages`, payload);
-    return response.data;
+    console.log('=== CREATE PACKAGE API DEBUG ===');
+    console.log('📡 API URL:', `${api.defaults.baseURL}/api/service-packages`);
+    console.log('📦 Payload being sent:', JSON.stringify(payload, null, 2));
+    
+    // Check authentication
+    const savedUser = localStorage.getItem('nvh_user');
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        console.log('👤 Current user:', {
+            email: user.email,
+            role: user.role,
+            hasToken: !!user.token,
+            tokenPreview: user.token ? `${user.token.substring(0, 20)}...` : 'No token'
+        });
+    }
+    
+    try {
+        const response = await api.post<ServicePackageDTO>(`/api/service-packages`, payload);
+        console.log('✅ Package created successfully:', {
+            status: response.status,
+            data: response.data
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error('❌ Create package API error:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            requestData: payload
+        });
+        throw error;
+    }
 }
 
 export async function updatePackage(id: number, payload: Partial<ServicePackageDTO>) {
-    const response = await api.put<ServicePackageDTO>(`/api/packages/${id}`, payload);
+    const response = await api.put<ServicePackageDTO>(`/api/service-packages/${id}`, payload);
     return response.data;
 }
 
 export async function deletePackage(id: number) {
-    await api.delete(`/api/packages/${id}`);
+    await api.delete(`/api/service-packages/${id}`);
 }
 
 export type RoleEnum = 'ADMIN' | 'STAFF' | 'MEMBER';
