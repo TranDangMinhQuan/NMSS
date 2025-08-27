@@ -1,6 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+// Toast component đơn giản
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
+function Toast({ message, onClose, type = 'success' }: { readonly message: string; readonly onClose: () => void; readonly type?: 'success' | 'error' }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 2200);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+  return (
+    <div className={`fixed top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-50 animate-fade-in flex items-center gap-3 ${type === 'success' ? 'bg-gradient-to-r from-green-400 to-blue-500' : 'bg-gradient-to-r from-red-400 to-pink-500'} text-white`}>
+      {type === 'success' ? (
+        <CheckCircleIcon className="w-6 h-6 text-white drop-shadow" />
+      ) : (
+        <XCircleIcon className="w-6 h-6 text-white drop-shadow" />
+      )}
+      <span className="font-semibold text-base">{message}</span>
+    </div>
+  );
+}
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Logo from '../assets/logo.svg';
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +29,8 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login, error } = useAuth();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [toastColor, setToastColor] = useState<string>('bg-red-500');
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,13 +45,29 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       const user = await login({ email: formData.email, password: formData.password });
-      if (user && user.role === 'member') {
-        navigate('/member-services');
-      } else if (user) {
-        navigate('/dashboard');
+      if (user) {
+        setToastColor('bg-green-500');
+        setToastMsg('Đăng nhập thành công!');
+        setTimeout(() => {
+          if (user.role === 'admin') {
+            navigate('/dashboard');
+          } else if (user.role === 'member') {
+            navigate('/member-services');
+          } else if (user.role === 'staff') {
+            navigate('/members');
+          } else {
+            localStorage.removeItem('nvh_user');
+            navigate('/login');
+          }
+        }, 1500);
       }
     } catch (err) {
-      console.error('Login failed:', err);
+      setToastColor('bg-red-500');
+      setToastMsg(
+        err instanceof Error
+          ? `Đăng nhập thất bại! ${err.message}`
+          : 'Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.'
+      );
     } finally {
       setLoading(false);
     }
@@ -39,11 +76,18 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} type={toastColor === 'bg-green-500' ? 'success' : 'error'} />}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">NVH</span>
-          </div>
+          <span className="relative w-12 h-12 flex items-center justify-center">
+            <img
+              src={Logo}
+              alt="Logo Gym"
+              className="w-12 h-12 transition-transform duration-500 hover:scale-110 hover:rotate-6 drop-shadow-xl"
+              style={{ filter: 'drop-shadow(0 0 8px #a78bfa)' }}
+            />
+            <span className="absolute inset-0 rounded-full animate-pulse bg-gradient-to-tr from-purple-400 via-blue-300 to-pink-300 opacity-30"></span>
+          </span>
         </div>
         <div className="mt-3 text-center">
           <Link to="/" className="text-sm text-primary-600 hover:text-primary-500 inline-flex items-center gap-2">

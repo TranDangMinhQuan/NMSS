@@ -12,20 +12,20 @@ const ServicesPage: React.FC = () => {
 
   const services = [
     {
-      id: 1,
+      id: 'gym',
       name: 'Phòng Gym',
       category: 'gym',
-      description: 'Phòng tập thể dục hiện đại với đầy đủ thiết bị tập luyện chuyên nghiệp',
+      description: 'Phòng gym hiện đại, trang bị đầy đủ thiết bị, không gian thoải mái, mở cửa từ 5AM - 11PM.',
       price: 200000,
       unit: 'tháng',
       image: 'https://www.nhavanhoasinhvien.vn/wp-content/uploads/2024/12/z6102634179598_0efe25717f0d11fb8140cf59f07e467a-scaled.jpg',
       features: ['Thiết bị hiện đại', 'Huấn luyện viên', 'Phòng thay đồ', 'Tủ khóa'],
     },
     {
-      id: 2,
+      id: 'bowling',
       name: 'Bowling',
       category: 'bowling',
-      description: 'Sân bowling chuyên nghiệp với 8 làn chơi và thiết bị hiện đại',
+      description: 'Sân bowling chuẩn quốc tế với 8 làn chơi, hệ thống chấm điểm tự động, bóng và giày chất lượng cao, không gian giải trí hiện đại, phù hợp cho cá nhân, nhóm bạn và sự kiện.',
       price: 80000,
       unit: 'lần',
       image: ' https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_X_xphVZN4rihWkQrM_5iqZR5b3SfVWOxQQ&s',
@@ -36,6 +36,8 @@ const ServicesPage: React.FC = () => {
   const filteredServices = selectedCategory === 'all' 
     ? services 
     : services.filter(service => service.category === selectedCategory);
+
+  // ...removed time selection for service cards...
 
   return (
     <div className="space-y-8">
@@ -67,7 +69,7 @@ const ServicesPage: React.FC = () => {
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
         {filteredServices.map((service) => (
-          <div key={service.id} className="bg-white rounded-lg shadow-lg overflow-hidden max-w-md w-full mx-auto hover:shadow-xl transition-transform transform hover:-translate-y-1">
+          <div key={service.id} className="bg-white rounded-lg shadow-lg overflow-hidden max-w-md w-full mx-auto flex flex-col h-full hover:shadow-xl transition-transform transform hover:-translate-y-1">
             <div className="h-56 bg-gray-200">
               <img
                 src={service.image}
@@ -75,7 +77,7 @@ const ServicesPage: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-6">
+            <div className="p-6 flex flex-col flex-1">
               <h3 className="text-2xl font-semibold text-gray-900 mb-2">{service.name}</h3>
               <p className="text-gray-600 mb-4">{service.description}</p>
 
@@ -94,23 +96,14 @@ const ServicesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-primary-600 font-bold">
-                  {service.price.toLocaleString()} VNĐ/{service.unit}
-                </span>
-                <div className="flex gap-2 items-center">
-                  <Link
-                    to="/booking"
-                    className="btn-primary text-sm"
-                  >
-                    Đặt chỗ
-                  </Link>
-                  <button className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
-                </div>
+              <div className="flex-1"></div>
+              <div className="flex items-center justify-center mt-4">
+                <Link
+                  to="/membership"
+                  className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-700 text-white font-semibold shadow hover:scale-105 hover:shadow-lg transition-all duration-200 text-base"
+                >
+                  Mua gói thành viên
+                </Link>
               </div>
             </div>
           </div>

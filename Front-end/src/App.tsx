@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import { useAuth } from './hooks/useAuth';
 
@@ -11,11 +13,12 @@ const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const AdminServiceManagement = React.lazy(() => import('./pages/AdminServiceManagement'));
 const AdminPackageManagement = React.lazy(() => import('./pages/AdminPackageManagement'));
 const MembershipPage = React.lazy(() => import('./pages/MembershipPage'));
-const BookingPage = React.lazy(() => import('./pages/BookingPage'));
+// BookingPage removed
 const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
 const MembersManagementPage = React.lazy(() => import('./pages/MembersManagementPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
+const MyMembershipsPage = React.lazy(() => import('./pages/MyMembershipsPage'));
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> = ({ 
@@ -84,6 +87,16 @@ const App: React.FC = () => {
               <RegisterPage />
             </PublicRoute>
           } />
+          <Route path="/forgot-password" element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          } />
+          <Route path="/reset-password" element={
+            <PublicRoute>
+              <ResetPasswordPage />
+            </PublicRoute>
+          } />
           
           {/* Protected Routes with MainLayout */}
           <Route path="/" element={
@@ -143,15 +156,7 @@ const App: React.FC = () => {
             </MainLayout>
           } />
           
-          <Route path="/booking" element={
-            <ProtectedRoute roles={['member', 'staff', 'admin']}>
-              <MainLayout>
-                <React.Suspense fallback={<div>Loading...</div>}>
-                  <BookingPage />
-                </React.Suspense>
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+          {/* Booking route removed */}
 
           <Route path="/payment" element={
             <ProtectedRoute roles={['member']}>
@@ -190,13 +195,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/bookings" element={
-            <ProtectedRoute roles={['admin', 'staff']}>
-              <MainLayout>
-                <div>Bookings Management Page</div>
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+          {/* Bookings management route removed */}
           
           <Route path="/checkin" element={
             <ProtectedRoute roles={['admin', 'staff']}>
@@ -249,18 +248,14 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/my-bookings" element={
-            <ProtectedRoute roles={['member']}>
-              <MainLayout>
-                <div>My Bookings Page</div>
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+          {/* My Bookings route removed - booking functionality deprecated */}
           
           <Route path="/my-memberships" element={
             <ProtectedRoute roles={['member']}>
               <MainLayout>
-                <div>My Memberships Page</div>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <MyMembershipsPage />
+                </React.Suspense>
               </MainLayout>
             </ProtectedRoute>
           } />

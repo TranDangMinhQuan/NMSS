@@ -18,10 +18,6 @@ const FaqAccordion: React.FC = () => {
       a: 'Phòng gym: 6:00 - 22:00 (gói cơ bản), 24/7 (gói cao cấp và VIP)\nBowling: 10:00 - 23:00 hàng ngày\nLớp nhóm: 7:00 - 21:00 (có lịch cụ thể cho từng môn)',
     },
     {
-      q: 'Làm sao để đặt lịch bowling hoặc lớp nhóm?',
-      a: 'Sử dụng chức năng "Đặt chỗ" trên trang dịch vụ để chọn ngày, giờ và số lượng. Thành viên sẽ được ưu tiên đặt trước.',
-    },
-    {
       q: 'Có ưu đãi gì cho sinh viên không?',
       a: 'Có, NVH áp dụng nhiều chương trình giảm giá dành cho sinh viên và thành viên, bao gồm giảm giá dịch vụ và ưu đãi khi mua gói dài hạn.',
     },
@@ -112,7 +108,7 @@ const MembershipPage: React.FC = () => {
       features: [
         'Tất cả quyền lợi gói cơ bản',
         'Giảm giá 20% cho các dịch vụ',
-        'Ưu tiên đặt chỗ',
+        'Ưu tiên sử dụng dịch vụ',
         'Tích điểm gấp đôi',
         'Hỗ trợ ưu tiên',
         'Miễn phí khóa học định kỳ',
@@ -128,7 +124,7 @@ const MembershipPage: React.FC = () => {
       features: [
         'Tất cả quyền lợi gói Premium',
         'Giảm giá 30% cho các dịch vụ',
-        'Đặt chỗ không giới hạn',
+        'Truy cập không giới hạn',
         'Tích điểm gấp ba',
         'Hỗ trợ 24/7',
         'Miễn phí tất cả khóa học',
@@ -148,15 +144,6 @@ const MembershipPage: React.FC = () => {
       ),
       title: 'Tiết kiệm chi phí',
       description: 'Giảm giá đặc biệt cho thành viên trên tất cả dịch vụ',
-    },
-    {
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      title: 'Ưu tiên đặt chỗ',
-      description: 'Đặt chỗ trước và ưu tiên sử dụng dịch vụ',
     },
     {
       icon: (
@@ -197,16 +184,16 @@ const MembershipPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
           {benefits.map((benefit) => (
-            <div key={benefit.title} className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div key={benefit.title} className="flex flex-col items-center w-56">
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4">
                 <div className="text-primary-600">
                   {benefit.icon}
                 </div>
               </div>
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-              <p className="text-gray-600 text-sm md:text-sm">{benefit.description}</p>
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2 text-center">{benefit.title}</h3>
+              <p className="text-gray-600 text-sm md:text-sm text-center">{benefit.description}</p>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@ package com.nms.backend.controller.center;
 
 import com.nms.backend.dto.center.ServicePackageDTO;
 import com.nms.backend.service.center.ServicePackageService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/service-packages")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "api")
 public class ServicePackageAPI {
 
     private final ServicePackageService servicePackageService;

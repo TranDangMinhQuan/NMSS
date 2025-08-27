@@ -38,6 +38,7 @@ public class ServiceDetails {
     @ManyToMany(mappedBy = "serviceDetails")
     private Set<ServicePackage> servicePackages;
 
+
     @Column(nullable = false)
     private Boolean status = true;
 }
