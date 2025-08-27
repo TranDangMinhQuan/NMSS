@@ -11,25 +11,12 @@ export type MembershipPlan = {
 	description?: string;
 };
 
-export type BookingPayment = {
-  serviceId: string;
-  serviceName: string;
-  pricePerHour: number;
-  date: string;
-  time: string;
-  durationHours: number;
-};
-
 export type LocationState =
-  | {
-      type: 'membership';
-      plan: MembershipPlan;
-    }
-  | {
-      type: 'booking';
-      booking: BookingPayment;
-    }
-  | undefined;
+	| {
+			type: 'membership';
+			plan: MembershipPlan;
+		}
+	| undefined;
 
 const PaymentPage: React.FC = () => {
 	const location = useLocation();
@@ -43,9 +30,6 @@ const PaymentPage: React.FC = () => {
 		if (state?.type === 'membership') {
 			return state.plan.price;
 		}
-		if (state?.type === 'booking') {
-			return state.booking.pricePerHour * state.booking.durationHours;
-		}
 		return 0;
 	}, [state]);
 
@@ -57,28 +41,25 @@ const PaymentPage: React.FC = () => {
 			setLoading(false);
 			if (state.type === 'membership') {
 				navigate('/my-memberships');
-			} else if (state.type === 'booking') {
-				navigate('/my-bookings');
 			}
 		}, 1500);
 	};
 
-	if (!state) {
-		return (
-			<div className="min-h-[70vh] flex items-center">
-				<div className="max-w-3xl mx-auto w-full">
-					<div className="bg-white rounded-lg shadow p-8 text-center">
-						<h1 className="text-2xl font-bold text-gray-900 mb-2">Không có dữ liệu thanh toán</h1>
-						<p className="text-gray-600 mb-6">Vui lòng thực hiện chọn gói hoặc đặt chỗ trước khi thanh toán.</p>
-						<div className="flex gap-3 justify-center">
-							<Link to="/membership" className="btn-secondary">Gói thành viên</Link>
-							<Link to="/booking" className="btn-primary">Đặt chỗ dịch vụ</Link>
+		if (!state) {
+			return (
+				<div className="min-h-[70vh] flex items-center">
+					<div className="max-w-3xl mx-auto w-full">
+						<div className="bg-white rounded-lg shadow p-8 text-center">
+							<h1 className="text-2xl font-bold text-gray-900 mb-2">Không có dữ liệu thanh toán</h1>
+							<p className="text-gray-600 mb-6">Vui lòng thực hiện chọn gói thành viên trước khi thanh toán.</p>
+							<div className="flex gap-3 justify-center">
+								<Link to="/membership" className="btn-primary">Gói thành viên</Link>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		);
-	}
+			);
+		}
 
 	return (
 		<div className="min-h-[70vh] flex">
@@ -87,60 +68,27 @@ const PaymentPage: React.FC = () => {
 				<div className="lg:col-span-1">
 					<div className="bg-white rounded-lg shadow p-6 sticky top-6">
 						<h2 className="text-lg font-semibold text-gray-900 mb-4">Tóm tắt thanh toán</h2>
-						{state.type === 'membership' && (
-							<div className="space-y-3">
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Loại:</span>
-									<span className="font-medium">Gói thành viên</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Gói:</span>
-									<span className="font-medium">{state.plan.name}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Thời hạn:</span>
-									<span className="font-medium">{state.plan.duration}</span>
-								</div>
-								<hr />
-								<div className="flex justify-between text-lg font-bold">
-									<span>Tổng tiền</span>
-									<span className="text-primary-600">{totalAmount.toLocaleString()} VNĐ</span>
-								</div>
-							</div>
-						)}
-						{state.type === 'booking' && (
-							<div className="space-y-3">
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Loại:</span>
-									<span className="font-medium">Đặt chỗ dịch vụ</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Dịch vụ:</span>
-									<span className="font-medium">{state.booking.serviceName}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Ngày:</span>
-									<span className="font-medium">{state.booking.date}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Giờ:</span>
-									<span className="font-medium">{state.booking.time}</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Thời lượng:</span>
-									<span className="font-medium">{state.booking.durationHours} giờ</span>
-								</div>
-								<div className="flex justify-between text-sm">
-									<span className="text-gray-600">Đơn giá:</span>
-									<span className="font-medium">{state.booking.pricePerHour.toLocaleString()} VNĐ/giờ</span>
-								</div>
-								<hr />
-								<div className="flex justify-between text-lg font-bold">
-									<span>Tổng tiền</span>
-									<span className="text-primary-600">{totalAmount.toLocaleString()} VNĐ</span>
-								</div>
-							</div>
-						)}
+									{state.type === 'membership' && (
+										<div className="space-y-3">
+											<div className="flex justify-between text-sm">
+												<span className="text-gray-600">Loại:</span>
+												<span className="font-medium">Gói thành viên</span>
+											</div>
+											<div className="flex justify-between text-sm">
+												<span className="text-gray-600">Gói:</span>
+												<span className="font-medium">{state.plan.name}</span>
+											</div>
+											<div className="flex justify-between text-sm">
+												<span className="text-gray-600">Thời hạn:</span>
+												<span className="font-medium">{state.plan.duration}</span>
+											</div>
+											<hr />
+											<div className="flex justify-between text-lg font-bold">
+												<span>Tổng tiền</span>
+												<span className="text-primary-600">{totalAmount.toLocaleString()} VNĐ</span>
+											</div>
+										</div>
+									)}
 					</div>
 				</div>
 

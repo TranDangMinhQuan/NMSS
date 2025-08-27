@@ -132,13 +132,7 @@ const Header: React.FC = () => {
               >
                 Thành viên
               </Link>
-              <Link
-                to="/booking"
-                className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
-              >
-                Đặt chỗ
-              </Link>
-              
+              {/* Đã gỡ tính năng đặt chỗ */}
               {/* User Menu */}
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
@@ -162,12 +156,6 @@ const Header: React.FC = () => {
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Hồ sơ cá nhân
-                  </Link>
-                  <Link
-                    to="/my-bookings"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Lịch đặt chỗ
                   </Link>
                   <Link
                     to="/my-memberships"
