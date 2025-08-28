@@ -8,6 +8,9 @@ import DashboardPage from './pages/DashboardPage';
 import { useAuth } from './hooks/useAuth';
 
 // Lazy load pages for better performance
+const AdminAccountsPage = React.lazy(() => import('./pages/AdminAccountsPage'));
+const StaffAccountsPage = React.lazy(() => import('./pages/StaffAccountsPage'));
+const MemberAccountsPage = React.lazy(() => import('./pages/MemberAccountsPage'));
 const HomePage = React.lazy(() => import('./pages/HomePage'));
 const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const AdminServiceManagement = React.lazy(() => import('./pages/AdminServiceManagement'));
@@ -43,7 +46,14 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> 
   }
 
   if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect based on user role instead of always going to dashboard
+    if (user.role === 'member') {
+      return <Navigate to="/member-services" replace />;
+    } else if (user.role === 'staff') {
+      return <Navigate to="/members" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;
@@ -168,7 +178,34 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
 
-          {/* Admin/Staff Routes */}
+          {/* Account Management Routes */}
+          <Route path="/accounts/admin" element={
+            <ProtectedRoute roles={["admin"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <AdminAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/accounts/staff" element={
+            <ProtectedRoute roles={["admin", "staff"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <StaffAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/accounts/member" element={
+            <ProtectedRoute roles={["admin", "staff"]}>
+              <MainLayout>
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <MemberAccountsPage />
+                </React.Suspense>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/members" element={
             <ProtectedRoute roles={['admin', 'staff']}>
               <MainLayout>
@@ -187,18 +224,10 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/packages" element={
-            <ProtectedRoute roles={['admin', 'staff']}>
-              <MainLayout>
-                <div>Packages Management Page</div>
-              </MainLayout>
-            </ProtectedRoute>
-          } />
-          
           {/* Bookings management route removed */}
           
           <Route path="/checkin" element={
-            <ProtectedRoute roles={['admin', 'staff']}>
+            <ProtectedRoute roles={['admin', 'staff', 'member']}>
               <MainLayout>
                 <div>Check-in Page</div>
               </MainLayout>

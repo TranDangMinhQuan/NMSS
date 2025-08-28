@@ -1,35 +1,3 @@
-export async function forgotPasswordRequest(email: string) {
-    const response = await api.post('/api/forgot-password-request', { email });
-    return response.data;
-}
-
-export async function resetPassword(token: string, newPassword: string) {
-    const response = await api.post('/api/reset-password-request', { token, newPassword });
-    return response.data as string;
-}
-export interface MemberProfile {
-    fullName: string;
-    email: string;
-    gender: 'MALE' | 'FEMALE';
-    dateOfBirth: string;
-    cccd: string;
-    phone: string;
-    address: string;
-    status: string;
-}
-
-export async function getMemberProfile() {
-    // Backend profile endpoint is GET /api/account/view-profile
-    const response = await api.get<MemberProfile>('/api/account/view-profile');
-    return response.data;
-}
-
-export async function updateMemberProfile(data: Partial<MemberProfile>) {
-    // Backend returns 200 with no body for this endpoint, so refetch profile afterwards
-    await api.put<void>('/api/account/member/profile', data);
-    const refreshed = await getMemberProfile();
-    return refreshed;
-}
 import axios from 'axios';
 
 const api = axios.create({
@@ -48,6 +16,17 @@ api.interceptors.request.use((config) => {
       if (user?.token) {
         config.headers = config.headers || {};
         config.headers['Authorization'] = `Bearer ${user.token}`;
+        
+        // Debug: Log authentication details for package/service requests
+        if (config.url?.includes('service-packages') || config.url?.includes('service-types')) {
+          console.log('🔐 Auth Debug:', {
+            url: config.url,
+            method: config.method?.toUpperCase(),
+            userRole: user.role,
+            hasToken: !!user.token,
+            authHeader: config.headers['Authorization'] ? 'Present' : 'Missing'
+          });
+        }
       }
     }
   } catch {
@@ -77,14 +56,52 @@ export async function register(data: RegisterPayload) {
     return response.data;
 }
 
+export async function forgotPasswordRequest(email: string) {
+    const response = await api.post('/api/forgot-password-request', { email });
+    return response.data;
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+    const response = await api.post('/api/reset-password-request', { token, newPassword });
+    return response.data as string;
+}
+
+export interface MemberProfile {
+    fullName: string;
+    email: string;
+    gender: 'MALE' | 'FEMALE';
+    dateOfBirth: string;
+    cccd: string;
+    phone: string;
+    address: string;
+    status: string;
+}
+
+export async function getMemberProfile() {
+    // Backend profile endpoint is GET /api/account/view-profile
+    const response = await api.get<MemberProfile>('/api/account/view-profile');
+    return response.data;
+}
+
 // ================= Admin Data Fetching (aligned with BE DTOs) =================
+
+export interface CenterDTO {
+    id: number;
+    name: string;
+    address: string;
+    phone: string;
+}
 
 export interface ServiceTypeDTO {
     id: number;
     name: string;
-    description: string;
     centerId: number;
-    status: boolean;
+    // Note: Backend doesn't have description or status fields
+}
+
+export async function getAllCenters() {
+    const response = await api.get<CenterDTO[]>(`/api/centers`);
+    return response.data;
 }
 
 export async function getServiceTypesByCenter(centerId: number) {
@@ -112,7 +129,7 @@ export interface ServicePackageDTO {
     minPrice: number;
     maxPrice: number;
     totalSessions: number;
-    dayConstraints: string;
+    allowedDays: string[]; // Backend uses allowedDays as List<String> (MONDAY, TUESDAY, etc.)
     maxDurationMinutes: number;
     maxUsesPerDay?: number;
     status?: boolean;
@@ -120,22 +137,53 @@ export interface ServicePackageDTO {
 }
 
 export async function getAllPackages() {
-    const response = await api.get<ServicePackageDTO[]>(`/api/packages`);
+    const response = await api.get<ServicePackageDTO[]>(`/api/service-packages/active`);
     return response.data;
 }
 
 export async function createPackage(payload: Partial<ServicePackageDTO>) {
-    const response = await api.post<ServicePackageDTO>(`/api/packages`, payload);
-    return response.data;
+    console.log('=== CREATE PACKAGE API DEBUG ===');
+    console.log('📡 API URL:', `${api.defaults.baseURL}/api/service-packages`);
+    console.log('📦 Payload being sent:', JSON.stringify(payload, null, 2));
+    
+    // Check authentication
+    const savedUser = localStorage.getItem('nvh_user');
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        console.log('👤 Current user:', {
+            email: user.email,
+            role: user.role,
+            hasToken: !!user.token,
+            tokenPreview: user.token ? `${user.token.substring(0, 20)}...` : 'No token'
+        });
+    }
+    
+    try {
+        const response = await api.post<ServicePackageDTO>(`/api/service-packages`, payload);
+        console.log('✅ Package created successfully:', {
+            status: response.status,
+            data: response.data
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error('❌ Create package API error:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            requestData: payload
+        });
+        throw error;
+    }
 }
 
 export async function updatePackage(id: number, payload: Partial<ServicePackageDTO>) {
-    const response = await api.put<ServicePackageDTO>(`/api/packages/${id}`, payload);
+    const response = await api.put<ServicePackageDTO>(`/api/service-packages/${id}`, payload);
     return response.data;
 }
 
 export async function deletePackage(id: number) {
-    await api.delete(`/api/packages/${id}`);
+    await api.delete(`/api/service-packages/${id}`);
 }
 
 export type RoleEnum = 'ADMIN' | 'STAFF' | 'MEMBER';
@@ -155,9 +203,161 @@ export interface AccountResponse {
     token?: string;
 }
 
+export interface AccountUpdateDTO {
+    fullName: string;
+    gender: 'MALE' | 'FEMALE';
+    dateOfBirth: string;
+    phone: string;
+    address: string;
+}
+
+export interface AccountProfileDTO {
+    fullName: string;
+    email: string;
+    gender: 'MALE' | 'FEMALE';
+    dateOfBirth: string;
+    cccd: string;
+    phone: string;
+    address: string;
+}
+
 export async function getAccountsByRole(role: RoleEnum) {
     const response = await api.get<AccountResponse[]>(`/api/account/list-account/${role}`);
     return response.data;
+}
+
+export async function updateAdminAccount(data: AccountUpdateDTO) {
+    const response = await api.put(`/api/account/manager/profile`, data);
+    return response.data;
+}
+
+export async function deleteAdminAccount(id: number) {
+    const response = await api.put(`/api/account/admin/delete/${id}/INACTIVE`);
+    return response.data;
+}
+
+export async function getMembers() {
+    const response = await api.get<AccountResponse[]>(`/api/account/list-account/member`);
+    return response.data;
+}
+
+export async function updateMemberProfile(data: AccountProfileDTO) {
+    // Debug logging
+    console.log('=== UPDATE MEMBER PROFILE DEBUG ===');
+    console.log('Request URL:', `${api.defaults.baseURL}/api/account/member/profile`);
+    console.log('Request Method:', 'PUT');
+    console.log('Request Data:', JSON.stringify(data, null, 2));
+    
+    // Check token
+    const savedUser = localStorage.getItem('nvh_user');
+    let currentUser = null;
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        console.log('Current User:', {
+            email: currentUser.email,
+            role: currentUser.role,
+            hasToken: !!currentUser.token,
+            tokenPreview: currentUser.token ? `${currentUser.token.substring(0, 20)}...` : 'No token'
+        });
+    } else {
+        console.log('No user found in localStorage');
+    }
+    
+    try {
+        const response = await api.put(`/api/account/member/profile`, data);
+        console.log('Response Status:', response.status);
+        console.log('Response Data:', response.data);
+        console.log('Response Headers:', response.headers);
+        
+        // Validate response
+        if (response.status === 200 || response.status === 204) {
+            console.log('✅ Member profile update successful');
+        } else {
+            console.warn('⚠️ Unexpected response status:', response.status);
+        }
+        return response.data;
+    } catch (error: any) {
+        console.log('=== API ERROR DEBUG ===');
+        console.log('Error Status:', error.response?.status);
+        console.log('Error Data:', error.response?.data);
+        console.log('Error Headers:', error.response?.headers);
+        console.log('Request Headers:', error.config?.headers);
+        
+        // If member endpoint fails with 500/403, try manager endpoint for ADMIN/STAFF users
+        const normalizedRole = currentUser?.role?.toUpperCase();
+        if ((error.response?.status === 500 || error.response?.status === 403) && 
+            currentUser && (normalizedRole === 'ADMIN' || normalizedRole === 'STAFF')) {
+            console.log('=== TRYING ALTERNATIVE ENDPOINT FOR ADMIN/STAFF ===');
+            try {
+                // Convert AccountProfileDTO to AccountUpdateDTO for manager endpoint
+                const managerData = {
+                    fullName: data.fullName,
+                    gender: data.gender,
+                    dateOfBirth: data.dateOfBirth,
+                    phone: data.phone,
+                    address: data.address
+                };
+                console.log('Using manager endpoint with data:', managerData);
+                const response = await api.put(`/api/account/manager/profile`, managerData);
+                console.log('Manager endpoint success:', response.status);
+                return response.data;
+            } catch (managerError: any) {
+                console.log('Manager endpoint also failed:', managerError.response?.status);
+                // Throw original error
+                throw error;
+            }
+        }
+        
+        throw error;
+    }
+}
+
+export async function deleteMemberAccount(id: number) {
+    const response = await api.put(`/api/account/staff/delete/${id}/INACTIVE`);
+    return response.data;
+}
+
+export async function updateStaffAccount(data: AccountUpdateDTO) {
+    const response = await api.put(`/api/account/manager/profile`, data);
+    return response.data;
+}
+
+export async function deleteStaffAccount(id: number) {
+    const response = await api.put(`/api/account/admin/delete/${id}/INACTIVE`);
+    return response.data;
+}
+
+// Account Create DTO type
+export interface AccountCreateDTO {
+    subject: string;
+    emailOwner: string;
+    email: string;
+    password: string;
+    cccd: string; // lowercase to match backend expectation
+    fullName: string;
+    gender: 'MALE' | 'FEMALE';
+    role: 'STAFF' | 'MEMBER';
+    bloodTypeId: number;
+    dateOfBirth: string; // yyyy-mm-dd format
+    phone: string;
+    address: string;
+}
+
+export async function createAccount(data: AccountCreateDTO) {
+    console.log('=== CREATE ACCOUNT DEBUG ===');
+    console.log('Request URL:', `${api.defaults.baseURL}/api/account/admin/create`);
+    console.log('Request Data:', JSON.stringify(data, null, 2));
+    
+    try {
+        const response = await api.post('/api/account/admin/create', data);
+        console.log('✅ Account created successfully:', response.status);
+        return response.data;
+    } catch (error: any) {
+        console.log('=== CREATE ACCOUNT ERROR ===');
+        console.log('Error Status:', error.response?.status);
+        console.log('Error Data:', error.response?.data);
+        throw error;
+    }
 }
 
 export interface DashboardStatsDTO {

@@ -63,41 +63,6 @@ const DashboardPage: React.FC = () => {
     </div>
   );
 
-  const RecentActivityCard: React.FC = () => (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Hoạt động gần đây</h3>
-      <div className="space-y-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Nguyễn Văn A đã đặt chỗ Gym</p>
-            <p className="text-xs text-gray-500">2 phút trước</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Trần Thị B gia hạn thẻ thành viên</p>
-            <p className="text-xs text-gray-500">15 phút trước</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Lê Văn C check-in Bowling</p>
-            <p className="text-xs text-gray-500">1 giờ trước</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Phạm Thị D đăng ký thành viên mới</p>
-            <p className="text-xs text-gray-500">2 giờ trước</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const QuickActionsCard: React.FC = () => (
     <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -223,8 +188,7 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentActivityCard />
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         <QuickActionsCard />
       </div>
     </div>

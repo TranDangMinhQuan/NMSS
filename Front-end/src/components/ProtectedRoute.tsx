@@ -1,10 +1,10 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 interface ProtectedRouteProps {
   allowedRoles: string[];
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
@@ -20,13 +20,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children 
   if (!allowedRoles.includes(user.role)) {
     let redirect = "/";
     if (user.role === "admin") redirect = "/dashboard";
-    else if (user.role === "member") redirect = "/services";
+    else if (user.role === "member") redirect = "/member-services";
     else if (user.role === "staff") redirect = "/members";
     return <Navigate to={redirect} replace />;
   }
 
-  // Nếu hợp lệ, render children
-  return <>{children}</>;
+  // Nếu hợp lệ, render children nếu có, nếu không render Outlet cho nested routes
+  return <>{children || <Outlet />}</>;
 };
 
 export default ProtectedRoute;

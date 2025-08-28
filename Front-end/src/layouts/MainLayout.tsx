@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import StaffSidebar from '../components/StaffSidebar';
 import Footer from '../components/Footer';
 import { useAuth } from '../hooks/useAuth';
 
@@ -38,11 +39,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }
 
   // If user is admin or staff, show sidebar layout WITHOUT header
-  if (user.role === 'admin' || user.role === 'staff') {
+  if (user.role === 'admin') {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <div className="flex flex-1 w-full">
           <Sidebar />
+          <main className="flex-1 p-8">
+            {children || <Outlet />}
+          </main>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  if (user.role === 'staff') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="flex flex-1 w-full">
+          <StaffSidebar />
           <main className="flex-1 p-8">
             {children || <Outlet />}
           </main>
