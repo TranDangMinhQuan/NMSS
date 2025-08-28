@@ -19,6 +19,7 @@ const Sidebar: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+  
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,10 +33,10 @@ const Sidebar: React.FC = () => {
     return location.pathname === path;
   };
 
-  const navItems = [
+  const menuItems = [
     {
       name: 'Dashboard',
-      href: '/dashboard',
+      path: '/dashboard',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
@@ -45,7 +46,7 @@ const Sidebar: React.FC = () => {
     },
     {
       name: 'Dịch vụ',
-      href: '/services',
+      path: '/services',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -54,7 +55,7 @@ const Sidebar: React.FC = () => {
     },
     {
       name: 'Gói dịch vụ',
-      href: '/packages',
+      path: '/packages',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -63,14 +64,11 @@ const Sidebar: React.FC = () => {
     },
   ];
 
-  // Staff only items (Admin không có)
-
-  // Admin only items
-  // Đã xóa adminItems vì không còn mục riêng cho admin ngoài dropdown Thành viên
-
-  // Logic để hiển thị menu theo role
-  // Không cần allItems nữa, render trực tiếp navItems, staffItems, 
-  // và dropdown Thành viên cho admin
+  const memberDropdownItems = [
+    { name: 'Admin', path: '/accounts/admin' },
+    { name: 'Staff', path: '/accounts/staff' },
+    { name: 'Member', path: '/accounts/member' },
+  ];
 
   return (
     <aside className="w-64 bg-white shadow-lg border-r border-gray-200 min-h-screen flex flex-col">
@@ -92,12 +90,13 @@ const Sidebar: React.FC = () => {
       {/* Navigation section */}
       <div className="p-6 flex-1">
         <nav className="space-y-2">
-          {navItems.map((item) => (
+          {/* Main menu items */}
+          {menuItems.map((item) => (
             <Link
-              key={item.href}
-              to={item.href}
+              key={item.path}
+              to={item.path}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive(item.href)
+                isActive(item.path)
                   ? 'bg-primary-100 text-primary-700'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`}
@@ -127,50 +126,22 @@ const Sidebar: React.FC = () => {
               </button>
               {dropdownOpen && (
                 <div className="absolute left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                  <Link
-                    to="/accounts/admin"
-                    className={`flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-primary-100 hover:text-primary-700 rounded-t-lg transition-colors`}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Admin
-                  </Link>
-                  <Link
-                    to="/accounts/staff"
-                    className={`flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-colors`}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Staff
-                  </Link>
-                  <Link
-                    to="/accounts/member"
-                    className={`flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-primary-100 hover:text-primary-700 rounded-b-lg transition-colors`}
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Member
-                  </Link>
+                  {memberDropdownItems.map((item, index) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setDropdownOpen(false)}
+                      className={`flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-primary-100 hover:text-primary-700 transition-colors ${
+                        index === 0 ? 'rounded-t-lg' : index === memberDropdownItems.length - 1 ? 'rounded-b-lg' : ''
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>
           )}
-
-          {/* Admin only items */}
-          {/* Đã xóa phần render adminItems */}
-
-          {/* Staff only items */}
-          {user?.role === 'staff' && staffItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive(item.href)
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-              }`}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </Link>
-          ))}
         </nav>
       </div>
 

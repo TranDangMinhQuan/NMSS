@@ -46,7 +46,14 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> 
   }
 
   if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    // Redirect based on user role instead of always going to dashboard
+    if (user.role === 'member') {
+      return <Navigate to="/member-services" replace />;
+    } else if (user.role === 'staff') {
+      return <Navigate to="/members" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;
@@ -217,18 +224,10 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/packages" element={
-            <ProtectedRoute roles={['admin', 'staff']}>
-              <MainLayout>
-                <div>Packages Management Page</div>
-              </MainLayout>
-            </ProtectedRoute>
-          } />
-          
           {/* Bookings management route removed */}
           
           <Route path="/checkin" element={
-            <ProtectedRoute roles={['admin', 'staff']}>
+            <ProtectedRoute roles={['admin', 'staff', 'member']}>
               <MainLayout>
                 <div>Check-in Page</div>
               </MainLayout>
